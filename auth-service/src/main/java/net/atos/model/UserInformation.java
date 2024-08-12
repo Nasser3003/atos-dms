@@ -1,4 +1,4 @@
-package net.atos.entity;
+package net.atos.model;
 
 import lombok.AccessLevel;
 import lombok.Data;
