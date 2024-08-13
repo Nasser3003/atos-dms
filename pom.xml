@@ -13,14 +13,14 @@
         <java.version>11</java.version>
         <spring-boot.version>2.6.3</spring-boot.version>
         <jjwt.version>0.12.3</jjwt.version>
+        <spring-security.version>5.6.0</spring-security.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
-        <module>auth-service</module>
+        <module>auth-user-service</module>
         <module>document-service</module>
         <module>search-service</module>
-        <module>user-management-service</module>
         <module>storage-service</module>
         <module>metadata-service</module>
     </modules>
@@ -38,6 +38,16 @@
                 <scope>import</scope>
             </dependency>
 
+            <!-- Oauth2 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-jose</artifactId>
+                <version>${spring-security.version}</version>
+            </dependency>
 
             <!-- JWT dependencies -->
             <dependency>

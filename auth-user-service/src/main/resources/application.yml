@@ -1,0 +1,23 @@
+# conf port
+server:
+  port: 3000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/atos_dms_auth_service
+    username: postgres
+    password: postgres
+
+  # conf spring security basic auth
+  security:
+    user:
+      name: spring
+      password: spring
+
+  jpa:
+    hibernate:
+#      ddl-auto: update
+#      ddl-auto: create
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
