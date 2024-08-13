@@ -3,7 +3,7 @@ package net.atos.service;
 import lombok.AllArgsConstructor;
 import net.atos.configuration.SecurityConfig;
 import net.atos.dto.AuthDTO;
-import net.atos.model.UserInformation;
+import net.atos.model.User;
 import net.atos.repository.UserInformationRepository;
 import net.atos.validation.AuthValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class UserAuthService {
 
     public void registerUser(AuthDTO authDTO) {
         authValidator.validateAuth(authDTO);
-        userRepository.save(new UserInformation(authDTO.getEmail(),
+        userRepository.save(new User(authDTO.getEmail(),
                 securityConfig.passwordEncoder().encode(authDTO.getPassword())));
     }
 

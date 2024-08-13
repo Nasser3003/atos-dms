@@ -1,13 +1,13 @@
 package net.atos.repository;
 
-import net.atos.model.UserInformation;
+import net.atos.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserInformationRepository extends JpaRepository<UserInformation, Long> {
+public interface UserInformationRepository extends JpaRepository<User, Long> {
 
-    Optional<UserInformation> findByEmail(String email);
+    Optional<User> findByEmail(String email);
 }
