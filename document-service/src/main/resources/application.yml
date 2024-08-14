@@ -4,10 +4,10 @@ server:
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/document_service
+      uri: mongodb://localhost:27017/atos_document_service
 
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://auth-service:8080/.well-known/jwks.json
+            jwk-set-uri: http://localhost:3000/auth/.well-known/jwks.json
