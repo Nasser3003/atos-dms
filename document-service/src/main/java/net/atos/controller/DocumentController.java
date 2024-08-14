@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.atos.dto.DocumentDto;
 import net.atos.service.DocumentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +35,12 @@ public class DocumentController {
     @PutMapping("/{id}")
     public ResponseEntity<DocumentDto> updateDocument(@PathVariable UUID id, @RequestBody DocumentDto documentDto) {
         return ResponseEntity.ok(documentService.updateDocument(id, documentDto));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin-only")
+    public String adminOnly() {
+        return "This is only accessible to admins";
     }
 
     @DeleteMapping("/{id}")
