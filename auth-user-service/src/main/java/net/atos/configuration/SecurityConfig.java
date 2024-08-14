@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -32,18 +30,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            RequestMatcher authRequestMatcher = new AntPathRequestMatcher("/auth/**", "POST");
         return http
                 .csrf().disable()
-                .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(authRequestMatcher).permitAll();
-                    auth.anyRequest().authenticated();
-                })
+                .authorizeRequests(auth -> auth
+                        .antMatchers("/auth/**").permitAll()
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
+
 
     @Bean
     public AuthenticationManager authManager() {
