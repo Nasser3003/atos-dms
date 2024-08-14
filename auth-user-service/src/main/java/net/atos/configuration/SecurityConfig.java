@@ -32,7 +32,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        RequestMatcher authRequestMatcher = new AntPathRequestMatcher("/auth/**", "POST");
+            RequestMatcher authRequestMatcher = new AntPathRequestMatcher("/auth/**", "POST");
         return http
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> {

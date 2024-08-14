@@ -1,7 +1,9 @@
 package net.atos;
 
+import org.springframework.boot.SpringApplication;
+
 public class DocumentServiceApp {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        SpringApplication.run(DocumentServiceApp.class, args);
     }
 }

@@ -1,10 +1,10 @@
 # conf port
 server:
-  port: 3000
+  port: 3001
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/atos_dms_auth_service
+    url: jdbc:postgresql://localhost:5432/atos_document_service
     username: postgres
     password: postgres
 
