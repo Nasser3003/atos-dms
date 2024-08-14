@@ -27,7 +27,7 @@ public class UserAuthService {
     public void registerUser(AuthDto authDTO) {
         authValidator.validateRegistration(authDTO);
         userRepository.save(new UserEntity(authDTO.getEmail(),
-                passwordEncoder.encode(authDTO.getPassword())));
+                passwordEncoder.encode(authDTO.getPassword()), authDTO.getNationalId()));
     }
 
     public LoginResponseDTO loginUser(AuthDto authDto) {

@@ -27,6 +27,9 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String nationalId;
+
     private String description;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -35,9 +38,10 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<EnumRole> roles = new HashSet<>();
 
-    public UserEntity(String email, String password) {
+    public UserEntity(String email, String password, String nationalId) {
         this.email = email;
         this.password = password;
+        this.nationalId = nationalId;
         this.roles.add(EnumRole.USER); // Default role
     }
 
