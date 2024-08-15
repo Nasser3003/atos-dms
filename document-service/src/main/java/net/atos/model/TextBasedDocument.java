@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class TextBasedDocument extends AbstractDocumentEntity {
+public class TextBasedDocument extends DocumentEntity {
 
     @NotNull
     @Field("word_count")

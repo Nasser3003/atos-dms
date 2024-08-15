@@ -15,7 +15,7 @@ import javax.validation.constraints.Min;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class VideoBasedDocument extends AbstractDocumentEntity {
+public class VideoBasedDocument extends DocumentEntity {
 
     @NotNull
     @Field("resolution")

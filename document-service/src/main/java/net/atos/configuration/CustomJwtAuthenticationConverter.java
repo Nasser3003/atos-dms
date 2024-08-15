@@ -1,6 +1,6 @@
 package net.atos.configuration;
 
-import net.atos.model.EnumRole;
+import net.atos.model.enums.EnumRole;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;

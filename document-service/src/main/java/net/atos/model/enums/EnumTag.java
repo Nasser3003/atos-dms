@@ -1,4 +1,4 @@
-package net.atos.model;
+package net.atos.model.enums;
 
 public enum EnumTag {
     WORK,

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class DocumentService {
+public class DocumentServiceImpl {
 
     private final TextBasedDocumentRepository textBasedDocumentRepository;
 

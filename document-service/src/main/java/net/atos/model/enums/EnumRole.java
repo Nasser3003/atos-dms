@@ -1,4 +1,4 @@
-package net.atos.model;
+package net.atos.model.enums;
 
 
 // note this mirrors the EnumRole in Auth-User-Service module
