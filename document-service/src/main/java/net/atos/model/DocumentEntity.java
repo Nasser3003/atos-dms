@@ -1,18 +1,16 @@
 package net.atos.model;
 
 import lombok.*;
-import net.atos.model.enums.EnumDataType;
-import net.atos.model.enums.EnumLanguages;
+import net.atos.model.enums.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.awt.font.TextAttribute;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,6 +30,7 @@ public class DocumentEntity {
         this.createdByUserId = createdByUserId;
         this.lastModifiedByUserId = createdByUserId;
         this.accessibleByUsers.add(createdByUserId);
+        initializeAttributes();
     }
 
     @Id
@@ -88,6 +87,28 @@ public class DocumentEntity {
     private String thumbnailPath;
 
     private Set<EnumLanguages> languages;
+
+    @Field("attributes")
+    private Map<Enum<?>, String> attributes;
+
+    private void initializeAttributes() {
+        switch (type) {
+            case VIDEO:
+                attributes = new HashMap<VideoAttribute, String>();
+                break;
+            case AUDIO:
+                attributes = new HashMap<AudioAttribute, String>();
+                break;
+            case TEXT:
+                attributes = new HashMap<TextAttribute, String>();
+                break;
+            case IMAGE:
+                attributes = new HashMap<ImageAttribute, String>();
+                break;
+            default:
+                attributes = new HashMap<>();
+        }
+    }
 
     private UUID generateId() {
         return UUID.randomUUID();
