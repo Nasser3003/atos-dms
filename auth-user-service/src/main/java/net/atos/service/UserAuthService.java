@@ -13,8 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserAuthService {
@@ -38,14 +36,15 @@ public class UserAuthService {
                         .getEmail(),authDto.getPassword())
         );
 
-        String token = jwtTokenService.generateJWT(auth);
-        UserEntity user = userRepository.findByEmail(authDto.getEmail()).get();
+        String token = jwtTokenService.generateJWT(auth, findUserByEmail(authDto.getEmail()).getId());
+        UserEntity user = findUserByEmail(authDto.getEmail());
 
-        return new LoginResponseDTO(user.getEmail(), token);
+        return new LoginResponseDTO(user.getId(), user.getEmail(), token);
     }
 
 
-    public Optional<UserEntity> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public UserEntity findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

@@ -4,8 +4,10 @@ import net.atos.model.enums.EnumRole;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -13,6 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,4 +51,18 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
             throw new BadCredentialsException("Invalid role: " + role);
         }
     }
+    public static UUID extractUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+            String subject = jwtAuth.getToken().getSubject();
+            try {
+                return UUID.fromString(subject);
+            } catch (IllegalArgumentException e) {
+                throw new BadCredentialsException("Invalid User ID in JWT");
+            }
+        }
+        throw new BadCredentialsException("User not authenticated or invalid authentication type");
+    }
+
 }

@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.awt.font.TextAttribute;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -20,7 +19,7 @@ public class DocumentEntity {
                           String name,
                           EnumDataType type,
                           String extension,
-                          BigInteger sizeInBytes,
+                          Long sizeInBytes,
                           UUID createdByUserId) {
         this.path = path;
         this.name = name;
@@ -30,8 +29,8 @@ public class DocumentEntity {
         this.createdByUserId = createdByUserId;
         this.lastModifiedByUserId = createdByUserId;
         this.accessibleByUsers.add(createdByUserId);
-        initializeAttributes();
-    }
+        initializeAttributes(type);
+        }
 
     @Id
     @Field("document_id")
@@ -46,7 +45,7 @@ public class DocumentEntity {
     private String name;
 
     @NotBlank
-    private EnumDataType type = EnumDataType.UNKNOWN;
+    private EnumDataType type;
 
     @NotBlank
     private String extension;
@@ -65,7 +64,7 @@ public class DocumentEntity {
 
     @NotNull
     @Field("size_in_bytes")
-    private BigInteger sizeInBytes;
+    private Long sizeInBytes;
 
     @NotNull
     @Field("created_by_user_id")
@@ -89,30 +88,86 @@ public class DocumentEntity {
     private Set<EnumLanguages> languages;
 
     @Field("attributes")
-    private Map<Enum<?>, String> attributes;
+    private Map<String, String> attributes = new HashMap<>();
 
-    private void initializeAttributes() {
+    private void initializeAttributes(EnumDataType type) {
+        attributes.clear();
         switch (type) {
             case VIDEO:
-                attributes = new HashMap<VideoAttribute, String>();
+                for (VideoAttribute attr : VideoAttribute.values())
+                    attributes.put(attr.name(), "");
                 break;
             case AUDIO:
-                attributes = new HashMap<AudioAttribute, String>();
+                for (AudioAttribute attr : AudioAttribute.values())
+                    attributes.put(attr.name(), "");
                 break;
             case TEXT:
-                attributes = new HashMap<TextAttribute, String>();
+                for (TextAttribute attr : TextAttribute.values())
+                    attributes.put(attr.name(), "");
                 break;
             case IMAGE:
-                attributes = new HashMap<ImageAttribute, String>();
+                for (ImageAttribute attr : ImageAttribute.values())
+                    attributes.put(attr.name(), "");
                 break;
             default:
                 attributes = new HashMap<>();
         }
     }
 
-    private UUID generateId() {
-        return UUID.randomUUID();
+    public DocumentEntity addAttribute(String key, String value) {
+        if (key == null || key.isEmpty())
+            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+
+        if (value == null)
+            throw new IllegalArgumentException("Attribute value cannot be null");
+
+        if (attributes.containsKey(key))
+            throw new IllegalArgumentException("Attribute already exists: " + key);
+
+        attributes.put(key, value);
+        return this;
     }
+
+    public DocumentEntity removeAttribute(String key) {
+        if (key == null || key.isEmpty())
+            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+
+        if (!attributes.containsKey(key))
+            throw new IllegalArgumentException("Attribute does not exist: " + key);
+
+        attributes.remove(key);
+        return this;
+    }
+
+    public boolean hasAttribute(String key) {
+        if (key == null || key.isEmpty())
+            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+
+        return attributes.containsKey(key);
+    }
+
+    public String getAttribute(String key) {
+        if (key == null || key.isEmpty())
+            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+
+        return attributes.get(key);
+    }
+
+    public DocumentEntity updateAttribute(String key, String value) {
+        if (key == null || key.isEmpty())
+            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+
+        if (value == null)
+            throw new IllegalArgumentException("Attribute value cannot be null");
+
+        if (!attributes.containsKey(key))
+            throw new IllegalArgumentException("Attribute does not exist: " + key);
+
+        attributes.put(key, value);
+        return this;
+    }
+
+
 
 }
 

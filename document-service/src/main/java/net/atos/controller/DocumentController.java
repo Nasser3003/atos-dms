@@ -2,7 +2,7 @@ package net.atos.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.dto.DocumentDto;
-import net.atos.service.IDocumentService;
+import net.atos.service.DocumentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentController {
 
-    private final IDocumentService documentService;
+    private final DocumentService documentService;
 
     @PostMapping
     public ResponseEntity<DocumentDto> createDocument(@RequestBody DocumentDto documentDto) {

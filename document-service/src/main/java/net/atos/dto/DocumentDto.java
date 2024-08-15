@@ -2,6 +2,7 @@ package net.atos.dto;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import net.atos.model.enums.EnumDataType;
 import net.atos.model.enums.EnumLanguages;
 
 import java.time.LocalDateTime;
@@ -9,12 +10,12 @@ import java.util.Set;
 import java.util.UUID;
 
 @Data
-@SuperBuilder
-public class AbstractDocumentDto {
+@AllArgsConstructor
+public class DocumentDto {
     private final UUID id;
     private final String path;
     private final String name;
-    private final String type;
+    private final EnumDataType type;
     private final String extension;
     private final LocalDateTime dateOfCreation;
     private final LocalDateTime lastAccessed;

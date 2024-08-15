@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +19,7 @@ public class JwtTokenService {
 
     private final JwtEncoder jwtEncoder;
 
-    public String generateJWT(Authentication auth) {
+    public String generateJWT(Authentication auth, UUID userId) {
         Instant now = Instant.now();
 
         String scope = auth.getAuthorities().stream()
@@ -31,6 +32,7 @@ public class JwtTokenService {
                 .expiresAt(now.plus(3, ChronoUnit.DAYS))
                 .subject(auth.getName())
                 .claim("roles", scope)
+                .claim("userId", userId.toString())
                 .build();
 
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
