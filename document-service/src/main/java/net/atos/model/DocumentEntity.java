@@ -7,35 +7,19 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
+@Builder
+@AllArgsConstructor
 public class DocumentEntity {
-    public DocumentEntity(String path,
-                          String name,
-                          EnumDataType type,
-                          String extension,
-                          Long sizeInBytes,
-                          UUID createdByUserId) {
-        this.path = path;
-        this.name = name;
-        this.type = type;
-        this.extension = extension;
-        this.sizeInBytes = sizeInBytes;
-        this.createdByUserId = createdByUserId;
-        this.lastModifiedByUserId = createdByUserId;
-        this.accessibleByUsers.add(createdByUserId);
-        initializeAttributes(type);
-        }
 
     @Id
     @Field("document_id")
     @Setter(AccessLevel.NONE)
     @NotNull
+    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @NotBlank
@@ -52,14 +36,17 @@ public class DocumentEntity {
 
     @NotNull
     @Field("date_of_creation")
+    @Builder.Default
     private LocalDateTime dateOfCreation = LocalDateTime.now();
 
     @NotNull
     @Field("last_accessed")
+    @Builder.Default
     private LocalDateTime lastAccessed = LocalDateTime.now();
 
     @NotNull
     @Field("last_modified")
+    @Builder.Default
     private LocalDateTime lastModified = LocalDateTime.now();
 
     @NotNull
@@ -72,23 +59,41 @@ public class DocumentEntity {
 
     @NotNull
     @Field("accessible_by_users")
+    @Builder.Default
     private Set<UUID> accessibleByUsers = new HashSet<>();
 
     @NotNull
     @Field("last_modified_by_user_id")
     private UUID lastModifiedByUserId;
 
-    private Set<String> tags;
+    @Builder.Default
+    private Set<String> tags = new HashSet<>();
 
+    @Builder.Default
     private boolean isPublic = false;
 
     @Field("thumbnail_path")
     private String thumbnailPath;
 
-    private Set<EnumLanguages> languages;
+    @Builder.Default
+    private Set<EnumLanguages> languages = new HashSet<>();
 
     @Field("attributes")
+    @Builder.Default
     private Map<String, String> attributes = new HashMap<>();
+
+    @Builder
+    public DocumentEntity(String path, String name, EnumDataType type, String extension, Long sizeInBytes, UUID createdByUserId) {
+        this.path = path;
+        this.name = name;
+        this.type = type;
+        this.extension = extension;
+        this.sizeInBytes = sizeInBytes;
+        this.createdByUserId = createdByUserId;
+        this.lastModifiedByUserId = createdByUserId;
+        this.accessibleByUsers.add(createdByUserId);
+        initializeAttributes(type);
+    }
 
     private void initializeAttributes(EnumDataType type) {
         attributes.clear();
@@ -166,8 +171,4 @@ public class DocumentEntity {
         attributes.put(key, value);
         return this;
     }
-
-
-
 }
-

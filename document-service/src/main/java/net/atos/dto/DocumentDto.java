@@ -1,32 +1,64 @@
 package net.atos.dto;
 
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
+import lombok.Data;
 import net.atos.model.enums.EnumDataType;
 import net.atos.model.enums.EnumLanguages;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class DocumentDto {
-    private final UUID id;
-    private final String path;
-    private final String name;
-    private final EnumDataType type;
-    private final String extension;
-    private final LocalDateTime dateOfCreation;
-    private final LocalDateTime lastAccessed;
-    private final LocalDateTime lastModified;
-    private final Long sizeInBytes;
-    private final UUID createdByUserId;
-    private final Set<UUID> accessibleByUsers;
-    private final UUID lastModifiedByUserId;
-    private final String summary;
-    private final Set<String> tags;
-    private final boolean isPublic;
-    private final String thumbnailPath;
-    private final Set<EnumLanguages> languages;
+    @NotNull
+    private UUID id;
+
+    @NotBlank
+    private String path;
+
+    @NotBlank
+    private String name;
+
+    @NotNull
+    private EnumDataType type;
+
+    @NotBlank
+    private String extension;
+
+    @NotNull
+    private LocalDateTime dateOfCreation;
+
+    @NotNull
+    private LocalDateTime lastAccessed;
+
+    @NotNull
+    private LocalDateTime lastModified;
+
+    @NotNull
+    private Long sizeInBytes;
+
+    @NotNull
+    private UUID createdByUserId;
+
+    @NotNull
+    private Set<UUID> accessibleByUsers;
+
+    @NotNull
+    private UUID lastModifiedByUserId;
+
+    private Set<String> tags;
+
+    private boolean isPublic;
+
+    private String thumbnailPath;
+
+    private Set<EnumLanguages> languages;
+
+    private Map<String, String> attributes;
+
 }

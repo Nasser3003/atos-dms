@@ -1,14 +1,13 @@
 package net.atos.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Setter(AccessLevel.NONE)
 public class LoginResponseDTO {
     private UUID uuid;
     private String email;
