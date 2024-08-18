@@ -1,6 +1,8 @@
 package net.atos.configuration;
 
 import net.atos.model.enums.EnumRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -19,9 +21,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        private static final Logger logger = LoggerFactory.getLogger(CustomJwtAuthenticationConverter.class);
+
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -51,13 +56,15 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
             throw new BadCredentialsException("Invalid role: " + role);
         }
     }
-    public static UUID extractUserId() {
+    public static UUID extractUserIdFromContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof JwtAuthenticationToken) {
             JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
-            String subject = jwtAuth.getToken().getSubject();
+            Jwt token = jwtAuth.getToken();
+            String userId = token.getClaimAsString("userId");
+
             try {
-                return UUID.fromString(subject);
+                return UUID.fromString(userId);
             } catch (IllegalArgumentException e) {
                 throw new BadCredentialsException("Invalid User ID in JWT");
             }

@@ -11,15 +11,14 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Data
-@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class DocumentEntity {
 
     @Id
     @Field("document_id")
     @Setter(AccessLevel.NONE)
     @NotNull
-    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @NotBlank
@@ -36,20 +35,22 @@ public class DocumentEntity {
 
     @NotNull
     @Field("date_of_creation")
-    @Builder.Default
     private LocalDateTime dateOfCreation = LocalDateTime.now();
 
     @NotNull
     @Field("last_accessed")
-    @Builder.Default
     private LocalDateTime lastAccessed = LocalDateTime.now();
 
     @NotNull
+    @Field("last_accessed_by_user_id")
+    private UUID lastAccessedByUserId;
+
+    @NotNull
     @Field("last_modified")
-    @Builder.Default
     private LocalDateTime lastModified = LocalDateTime.now();
 
     @NotNull
+    @Setter(AccessLevel.NONE)
     @Field("size_in_bytes")
     private Long sizeInBytes;
 
@@ -59,27 +60,22 @@ public class DocumentEntity {
 
     @NotNull
     @Field("accessible_by_users")
-    @Builder.Default
     private Set<UUID> accessibleByUsers = new HashSet<>();
 
     @NotNull
     @Field("last_modified_by_user_id")
     private UUID lastModifiedByUserId;
 
-    @Builder.Default
     private Set<String> tags = new HashSet<>();
 
-    @Builder.Default
     private boolean isPublic = false;
 
     @Field("thumbnail_path")
     private String thumbnailPath;
 
-    @Builder.Default
     private Set<EnumLanguages> languages = new HashSet<>();
 
     @Field("attributes")
-    @Builder.Default
     private Map<String, String> attributes = new HashMap<>();
 
     @Builder

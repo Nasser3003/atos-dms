@@ -1,6 +1,7 @@
 package net.atos.service;
 
-import net.atos.dto.DocumentDto;
+import net.atos.dto.DocumentEditDto;
+import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.exception.YouDoNotHaveThePermissions;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
@@ -19,29 +20,29 @@ public class DocumentUserService extends AbstractDocumentService {
     }
 
     @Override
-    public DocumentDto getDocument(UUID id) {
+    public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
-        if (isFileOwner(documentEntity))
-            return DocumentMapper.toDto(documentEntity);
-
-        throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+        if (NotFileOwner(documentEntity))
+            throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+        return DocumentMapper.mapToReadDocument(documentEntity);
     }
 
     @Override
-    public DocumentDto updateDocument(UUID id, DocumentDto documentDto) {
-        DocumentEntity documentEntity = findDocumentById(id);
-        if (isFileOwner(documentEntity))
-            // TODO
-            return null;
-        throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+    public DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto) {
+        UUID id = documentEditDto.getId();
+        DocumentEntity entity = findDocumentById(id);
+        if (NotFileOwner(entity))
+            throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+
+         return updateTheDocument(documentEditDto);
     }
 
     @Override
     public void deleteDocument(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
-        if (isFileOwner(documentEntity))
-            repository.deleteById(id);
-        else
+        if (NotFileOwner(documentEntity))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+
+        repository.deleteById(id);
     }
 }

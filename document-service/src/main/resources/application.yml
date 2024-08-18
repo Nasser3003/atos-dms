@@ -14,3 +14,12 @@ spring:
 auth:
   jwks:
     url: http://localhost:3000/auth/.well-known/jwks.json
+
+logging:
+  file:
+    name: /path/to/your/logs/application.log
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+    net.atos: DEBUG
+    org.springframework.security: DEBUG

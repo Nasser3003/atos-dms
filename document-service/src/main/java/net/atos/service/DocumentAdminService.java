@@ -1,6 +1,7 @@
 package net.atos.service;
 
-import net.atos.dto.DocumentDto;
+import net.atos.dto.DocumentEditDto;
+import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -20,21 +21,23 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
-    public DocumentDto getDocument(UUID id) {
+    public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
-        return DocumentMapper.toDto(documentEntity);
+        return DocumentMapper.mapToReadDocument(documentEntity);
     }
 
-    public List<DocumentDto> getAllDocuments() {
+    public List<DocumentReadOnlyDto> getAllDocuments() {
         return repository.findAll().stream()
-                .map(DocumentMapper::toDto)
+                .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public DocumentDto updateDocument(UUID id, DocumentDto documentDto) {
-        // TODO
-        return null;
+    public DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto) {
+        if (documentEditDto == null)
+            throw new IllegalArgumentException("documentEditDto cannot be null");
+
+        return updateTheDocument(documentEditDto);
     }
 
     @Override

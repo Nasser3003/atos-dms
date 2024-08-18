@@ -1,39 +1,53 @@
 package net.atos.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.atos.dto.DocumentDto;
+import net.atos.dto.DocumentCreateDto;
+import net.atos.dto.DocumentEditDto;
+import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.service.DocumentAdminService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/documents")
+@PreAuthorize("hasRole('USER')")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class DocumentUserController {
 
     private final DocumentAdminService documentAdminService;
+    private static final Logger logger = LoggerFactory.getLogger(DocumentUserController.class);
 
-    @PostMapping
-    public ResponseEntity<DocumentDto> createDocument(@RequestBody DocumentDto documentDto) {
-        return ResponseEntity.ok(documentAdminService.createDocument(documentDto));
+    @PostMapping("/document")
+    public ResponseEntity<DocumentReadOnlyDto> createDocument(@RequestBody DocumentCreateDto documentCreateDto) {
+        logger.info("Received request to create document: {}", documentCreateDto);
+        try {
+            DocumentReadOnlyDto result = documentAdminService.createDocument(documentCreateDto);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error creating document", e);
+            throw e;
+        }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<DocumentDto> getDocument(@PathVariable UUID id) {
-        return ResponseEntity.ok(documentAdminService.getDocument(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<DocumentDto>> getAllDocuments() {
+    @GetMapping("/documents")
+    public ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
         return ResponseEntity.ok(documentAdminService.getAllDocuments());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
+        return ResponseEntity.ok(documentAdminService.getDocument(id));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<DocumentDto> updateDocument(@PathVariable UUID id, @RequestBody DocumentDto documentDto) {
-        return ResponseEntity.ok(documentAdminService.updateDocument(id, documentDto));
+    public ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto) {
+        return ResponseEntity.ok(documentAdminService.updateDocument(documentEditDto));
     }
 
 
