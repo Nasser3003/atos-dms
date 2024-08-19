@@ -4,13 +4,16 @@ import lombok.RequiredArgsConstructor;
 import net.atos.dto.DocumentCreateDto;
 import net.atos.dto.DocumentEditDto;
 import net.atos.dto.DocumentReadOnlyDto;
-import net.atos.service.DocumentAdminService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.atos.model.enums.EnumDataType;
+import net.atos.service.DocumentUserService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,40 +23,46 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentUserController {
 
-    private final DocumentAdminService documentAdminService;
-    private static final Logger logger = LoggerFactory.getLogger(DocumentUserController.class);
+    private final DocumentUserService documentUserService;
 
-    @PostMapping("/document")
-    public ResponseEntity<DocumentReadOnlyDto> createDocument(@RequestBody DocumentCreateDto documentCreateDto) {
-        logger.info("Received request to create document: {}", documentCreateDto);
-        try {
-            DocumentReadOnlyDto result = documentAdminService.createDocument(documentCreateDto);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            logger.error("Error creating document", e);
-            throw e;
-        }
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DocumentReadOnlyDto> createDocument(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("type") EnumDataType type,
+            @RequestPart(value = "filePath", required = false) String filePath) {
+
+        DocumentCreateDto documentCreateDto = new DocumentCreateDto(
+                filePath != null ? filePath : file.getOriginalFilename(),
+                type,
+                file.getSize(),
+                file
+        );
+        return ResponseEntity.ok(documentUserService.createDocument(documentCreateDto));
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) throws IOException {
+        return documentUserService.downloadDocument(id);
     }
 
     @GetMapping("/documents")
     public ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
-        return ResponseEntity.ok(documentAdminService.getAllDocuments());
+        return ResponseEntity.ok(documentUserService.getAllDocuments());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/document/{id}")
     public ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
-        return ResponseEntity.ok(documentAdminService.getDocument(id));
+        return ResponseEntity.ok(documentUserService.getDocument(id));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update")
     public ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto) {
-        return ResponseEntity.ok(documentAdminService.updateDocument(documentEditDto));
+        return ResponseEntity.ok(documentUserService.updateDocument(documentEditDto));
     }
 
-
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
-        documentAdminService.deleteDocument(id);
+        documentUserService.deleteDocument(id);
         return ResponseEntity.noContent().build();
     }
 }

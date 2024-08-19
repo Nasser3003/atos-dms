@@ -1,9 +1,8 @@
 package net.atos.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.atos.model.enums.EnumDataType;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -11,12 +10,19 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@Setter(AccessLevel.NONE)
 public class DocumentCreateDto {
 
+    public DocumentCreateDto(String filePath, EnumDataType type, Long sizeInBytes, MultipartFile file) {
+        this.filePath = filePath;
+        this.type = type;
+        this.sizeInBytes = sizeInBytes;
+        this.file = file;
+    }
+
     @NotBlank(message = "Path cannot be blank")
-    @Size(max = 2500, message = "Path cannot exceed 255 characters")
+    @Size(max = 2500, message = "Path cannot exceed 2500 characters")
     private String filePath;
 
     @NotNull(message = "Type cannot be null")
@@ -26,7 +32,7 @@ public class DocumentCreateDto {
     @Positive(message = "Size must be a positive number")
     private Long sizeInBytes;
 
-    @NotBlank(message = "Extension cannot be blank")
-    @Size(max = 10, message = "Extension cannot exceed 10 characters")
-    private String extension;
+    @NotNull(message = "File cannot be null")
+    private MultipartFile file;
+
 }

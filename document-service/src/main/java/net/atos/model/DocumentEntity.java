@@ -16,6 +16,16 @@ import java.util.*;
 @NoArgsConstructor
 public class DocumentEntity {
 
+    public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId) {
+        this.filePath = filePath;
+        this.type = type;
+        this.sizeInBytes = sizeInBytes;
+        this.createdByUserId = createdByUserId;
+        this.lastModifiedByUserId = createdByUserId;
+        this.accessibleByUsers.add(createdByUserId);
+        initializeAttributes(type);
+    }
+
     @Id
     @Field("document_id")
     @Setter(AccessLevel.NONE)
@@ -77,17 +87,6 @@ public class DocumentEntity {
 
     @Field("attributes")
     private Map<String, String> attributes = new HashMap<>();
-
-    @Builder
-    public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId) {
-        this.filePath = filePath;
-        this.type = type;
-        this.sizeInBytes = sizeInBytes;
-        this.createdByUserId = createdByUserId;
-        this.lastModifiedByUserId = createdByUserId;
-        this.accessibleByUsers.add(createdByUserId);
-        initializeAttributes(type);
-    }
 
     private void initializeAttributes(EnumDataType type) {
         attributes.clear();

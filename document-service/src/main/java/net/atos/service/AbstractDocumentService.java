@@ -6,12 +6,23 @@ import net.atos.dto.DocumentCreateDto;
 import net.atos.dto.DocumentEditDto;
 import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.exception.DocumentNotFoundException;
+import net.atos.exception.FileStorageException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -28,8 +39,21 @@ public abstract class AbstractDocumentService {
                 CustomJwtAuthenticationConverter.extractUserIdFromContext()
         );
         repository.save(documentEntity);
+
+        try {
+            fileStorageService.storeFile(createDto.getFile(),
+                    createDto.getFilePath(),
+                    documentEntity.getId());
+        } catch (FileStorageException e) {
+            // If file storage fails, delete the database entry
+            repository.delete(documentEntity);
+            throw e;
+        }
+
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
+
+    public abstract List<DocumentReadOnlyDto> getAllDocuments();
 
     public abstract DocumentReadOnlyDto getDocument(UUID id);
 
@@ -42,7 +66,9 @@ public abstract class AbstractDocumentService {
         return !document.getCreatedByUserId().equals(userId);
     }
 
-    DocumentReadOnlyDto updateTheDocument(DocumentEditDto documentEditDto) {
+    public abstract ResponseEntity<Resource> downloadDocument(UUID id);
+
+    DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
 
@@ -81,6 +107,28 @@ public abstract class AbstractDocumentService {
     DocumentEntity findDocumentById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
+    }
+
+    ResponseEntity<Resource> downloadDocumentHelper(UUID id, DocumentEntity document) throws IOException {
+
+        Path filePath = fileStorageService.getFilePath(document.getId(),
+                document.getFilePath());
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (resource.exists() || resource.isReadable()) {
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null)
+                contentType = "application/octet-stream";
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        }
+        else
+            throw new FileNotFoundException("Could not read file: " + document.getFilePath());
     }
 
 

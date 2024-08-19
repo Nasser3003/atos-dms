@@ -11,11 +11,9 @@ public class DocumentMapper {
 
         return new DocumentReadOnlyDto(
                 entity.getId(),
-                entity.getPathToTheDirectory(),
-                entity.getName(),
+                entity.getFilePath(),
                 entity.getType(),
                 entity.getSizeInBytes(),
-                entity.getExtension(),
                 entity.getAccessibleByUsers(),
                 entity.getTags(),
                 entity.isPublic(),

@@ -5,6 +5,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/atos_document_service
+      
+  servlet:
+    multipart:
+      max-file-size: 10000MB
+      max-request-size: 10000MB
 
   security:
     oauth2:
@@ -27,3 +32,4 @@ logging:
 file:
   storage:
     location: ./files
+    
