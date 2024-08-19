@@ -21,7 +21,7 @@ public class DocumentEditDto {
 
     @NotBlank(message = "Path cannot be blank")
     @Size(max = 255, message = "Path cannot exceed 255 characters")
-    private String path;
+    private String pathToTheDirectory;
 
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
@@ -33,9 +33,6 @@ public class DocumentEditDto {
     @NotBlank(message = "Extension cannot be blank")
     @Size(max = 10, message = "Extension cannot exceed 10 characters")
     private String extension;
-
-    @Size(max = 100, message = "AccessibleByUsers cannot have more than 100 elements")
-    private Set<UUID> accessibleByUsers;
 
     @Size(max = 50, message = "Tags cannot have more than 50 elements")
     private Set<String> tags;

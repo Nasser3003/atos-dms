@@ -23,3 +23,7 @@ logging:
     org.springframework.web: DEBUG
     net.atos: DEBUG
     org.springframework.security: DEBUG
+
+file:
+  storage:
+    location: ./files

@@ -2,6 +2,7 @@ package net.atos.model;
 
 import lombok.*;
 import net.atos.model.enums.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -22,7 +23,12 @@ public class DocumentEntity {
     private UUID id = UUID.randomUUID();
 
     @NotBlank
-    private String path;
+    @Field("storage_url")
+    @Value("${file.storage.location}")
+    private String storageUrl;
+
+    @NotBlank
+    private String pathToTheDirectory;
 
     @NotBlank
     private String name;
@@ -80,7 +86,7 @@ public class DocumentEntity {
 
     @Builder
     public DocumentEntity(String path, String name, EnumDataType type, String extension, Long sizeInBytes, UUID createdByUserId) {
-        this.path = path;
+        this.pathToTheDirectory = path;
         this.name = name;
         this.type = type;
         this.extension = extension;

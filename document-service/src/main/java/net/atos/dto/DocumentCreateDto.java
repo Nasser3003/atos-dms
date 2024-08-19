@@ -17,7 +17,7 @@ public class DocumentCreateDto {
 
     @NotBlank(message = "Path cannot be blank")
     @Size(max = 255, message = "Path cannot exceed 255 characters")
-    private String path;
+    private String pathToTheDirectory;
 
     @NotBlank(message = "Name cannot be blank")
     @Size(max = 100, message = "Name cannot exceed 100 characters")

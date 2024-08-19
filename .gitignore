@@ -31,5 +31,8 @@ build/
 ### VS Code ###
 .vscode/
 
+### Uploaded FIles ###
+./files
+
 ### Mac OS ###
 .DS_Store

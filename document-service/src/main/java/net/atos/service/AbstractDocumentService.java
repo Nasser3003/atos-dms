@@ -21,7 +21,7 @@ public abstract class AbstractDocumentService {
 
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
         DocumentEntity documentEntity = new DocumentEntity(
-                createDto.getPath(),
+                createDto.getPathToTheDirectory(),
                 createDto.getName(),
                 createDto.getType(),
                 createDto.getExtension(),
@@ -49,12 +49,25 @@ public abstract class AbstractDocumentService {
 
         DocumentEntity entity = findDocumentById(documentEditDto.getId());
 
+
+        entity.setPathToTheDirectory(documentEditDto.getPathToTheDirectory());
+        entity.setName(documentEditDto.getName());
+        entity.setType(documentEditDto.getType());
+        entity.setExtension(documentEditDto.getExtension());
+        entity.setTags(documentEditDto.getTags());
+        entity.setPublic(documentEditDto.getIsPublic());
+
         entity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
         entity.setLastAccessed(LocalDateTime.now());
 
+
+
+        repository.save(entity);
+
+
         return new DocumentReadOnlyDto(
                 entity.getId(),
-                entity.getPath(),
+                entity.getPathToTheDirectory(),
                 entity.getName(),
                 entity.getType(),
                 entity.getSizeInBytes(),
