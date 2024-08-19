@@ -28,16 +28,10 @@ public class DocumentEntity {
     private String storageUrl;
 
     @NotBlank
-    private String pathToTheDirectory;
-
-    @NotBlank
-    private String name;
+    private String filePath;
 
     @NotBlank
     private EnumDataType type;
-
-    @NotBlank
-    private String extension;
 
     @NotNull
     @Field("date_of_creation")
@@ -85,11 +79,9 @@ public class DocumentEntity {
     private Map<String, String> attributes = new HashMap<>();
 
     @Builder
-    public DocumentEntity(String path, String name, EnumDataType type, String extension, Long sizeInBytes, UUID createdByUserId) {
-        this.pathToTheDirectory = path;
-        this.name = name;
+    public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId) {
+        this.filePath = filePath;
         this.type = type;
-        this.extension = extension;
         this.sizeInBytes = sizeInBytes;
         this.createdByUserId = createdByUserId;
         this.lastModifiedByUserId = createdByUserId;

@@ -1,5 +1,7 @@
 package net.atos.service;
 
+import net.atos.model.DocumentEntity;
+import net.atos.repository.DocumentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class LocalFileStorageService {
 
     private final Path fileStorageLocation;
+    private DocumentRepository documentRepository;
 
     public LocalFileStorageService(@Value("${file.storage.location}") String fileStorageLocation) throws IOException {
         this.fileStorageLocation = Paths.get(fileStorageLocation).toAbsolutePath().normalize();
@@ -36,4 +39,5 @@ public class LocalFileStorageService {
         String fileExtension = StringUtils.getFilenameExtension(originalFileName);
         return UUID.randomUUID() + (fileExtension != null ? "." + fileExtension : "");
     }
+
 }

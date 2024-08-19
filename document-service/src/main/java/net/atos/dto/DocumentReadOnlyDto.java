@@ -16,11 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class DocumentReadOnlyDto {
     private UUID id;
-    private String pathToTheDirectory;
-    private String name;
+    private String filePath;
     private EnumDataType type;
     private Long sizeInBytes;
-    private String extension;
     private Set<UUID> accessibleByUsers;
     private Set<String> tags;
     private boolean isPublic;

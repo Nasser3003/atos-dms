@@ -18,13 +18,12 @@ import java.util.UUID;
 public abstract class AbstractDocumentService {
 
     protected final DocumentRepository repository;
+    protected final LocalFileStorageService fileStorageService;
 
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
         DocumentEntity documentEntity = new DocumentEntity(
-                createDto.getPathToTheDirectory(),
-                createDto.getName(),
+                createDto.getFilePath(),
                 createDto.getType(),
-                createDto.getExtension(),
                 createDto.getSizeInBytes(),
                 CustomJwtAuthenticationConverter.extractUserIdFromContext()
         );
@@ -49,29 +48,21 @@ public abstract class AbstractDocumentService {
 
         DocumentEntity entity = findDocumentById(documentEditDto.getId());
 
-
-        entity.setPathToTheDirectory(documentEditDto.getPathToTheDirectory());
-        entity.setName(documentEditDto.getName());
+        entity.setFilePath(documentEditDto.getFilePath());
         entity.setType(documentEditDto.getType());
-        entity.setExtension(documentEditDto.getExtension());
         entity.setTags(documentEditDto.getTags());
         entity.setPublic(documentEditDto.getIsPublic());
 
         entity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
         entity.setLastAccessed(LocalDateTime.now());
 
-
-
         repository.save(entity);
-
 
         return new DocumentReadOnlyDto(
                 entity.getId(),
-                entity.getPathToTheDirectory(),
-                entity.getName(),
+                entity.getFilePath(),
                 entity.getType(),
                 entity.getSizeInBytes(),
-                entity.getExtension(),
                 entity.getAccessibleByUsers(),
                 entity.getTags(),
                 entity.isPublic(),
@@ -84,7 +75,6 @@ public abstract class AbstractDocumentService {
                 entity.getCreatedByUserId(),
                 entity.getLastModifiedByUserId(),
                 entity.getLastAccessedByUserId()
-
         );
     }
 
@@ -92,5 +82,6 @@ public abstract class AbstractDocumentService {
         return repository.findById(id)
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
     }
+
 
 }

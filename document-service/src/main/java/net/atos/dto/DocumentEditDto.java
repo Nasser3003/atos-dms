@@ -20,12 +20,8 @@ public class DocumentEditDto {
     private UUID id;
 
     @NotBlank(message = "Path cannot be blank")
-    @Size(max = 255, message = "Path cannot exceed 255 characters")
-    private String pathToTheDirectory;
-
-    @NotBlank(message = "Name cannot be blank")
-    @Size(max = 100, message = "Name cannot exceed 100 characters")
-    private String name;
+    @Size(max = 2500, message = "Path cannot exceed 255 characters")
+    private String filePath;
 
     @NotNull(message = "Type cannot be null")
     private EnumDataType type;

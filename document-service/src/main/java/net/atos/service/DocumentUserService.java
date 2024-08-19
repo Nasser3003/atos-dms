@@ -15,8 +15,8 @@ import java.util.UUID;
 public class DocumentUserService extends AbstractDocumentService {
 
     @Autowired
-    public DocumentUserService(DocumentRepository repository) {
-        super(repository);
+    public DocumentUserService(DocumentRepository repository, LocalFileStorageService localFileStorageService) {
+        super(repository, localFileStorageService);
     }
 
     @Override

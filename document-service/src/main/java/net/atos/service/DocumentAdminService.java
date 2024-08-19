@@ -15,9 +15,10 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentAdminService extends AbstractDocumentService {
 
+
     @Autowired
-    public DocumentAdminService(DocumentRepository repository) {
-        super(repository);
+    public DocumentAdminService(DocumentRepository repository, LocalFileStorageService fileStorageService) {
+        super(repository, fileStorageService);
     }
 
     @Override
