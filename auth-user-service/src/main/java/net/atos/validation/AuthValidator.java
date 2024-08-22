@@ -3,6 +3,7 @@ package net.atos.validation;
 import lombok.RequiredArgsConstructor;
 import net.atos.dto.AuthDto;
 import net.atos.repository.UserRepository;
+import net.atos.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,28 +14,26 @@ public class AuthValidator {
     private final UserRepository repository;
 
     public void validateAuth(AuthDto authDTO) {
-        if (authDTO == null) {
-            throw new IllegalArgumentException("Nothing was entered");
-        }
-        if (authDTO.getEmail() == null || authDTO.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email cannot be empty");
-        }
-        if (!isValidEmail(authDTO.getEmail())) {
-            throw new IllegalArgumentException("Invalid email format");
-        }
-        if (authDTO.getPassword() == null || authDTO.getPassword().isEmpty()) {
-            throw new IllegalArgumentException("Password cannot be empty");
-        }
+        if (authDTO == null)
+            throw new NullAuthDtoException();
+
+        if (authDTO.getEmail() == null || authDTO.getEmail().trim().isEmpty())
+            throw new EmptyFieldException("Email");
+
+        if (!isValidEmail(authDTO.getEmail()))
+            throw new InvalidEmailFormatException();
+
+        if (authDTO.getPassword() == null || authDTO.getPassword().isEmpty())
+            throw new EmptyFieldException("Password");
     }
 
     public void validateRegistration(AuthDto authDTO) {
         validateAuth(authDTO);
-        if (isEmailTaken(authDTO.getEmail())) {
-            throw new IllegalArgumentException("Email is already taken");
-        }
-        if (authDTO.getPassword().length() < 8) {
-            throw new IllegalArgumentException("Password must be at least 8 characters long");
-        }
+        if (isEmailTaken(authDTO.getEmail()))
+            throw new EmailAlreadyTakenException();
+
+        if (authDTO.getPassword().length() < 8)
+            throw new PasswordTooShortException();
     }
 
     private boolean isValidEmail(String email) {
@@ -47,5 +46,4 @@ public class AuthValidator {
     private boolean isEmailTaken(String email) {
         return repository.findByEmail(email).isPresent();
     }
-
 }

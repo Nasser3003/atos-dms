@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserAuthService {
+
     private final JwtTokenService jwtTokenService;
     private final UserRepository userRepository;
     private final AuthValidator authValidator;

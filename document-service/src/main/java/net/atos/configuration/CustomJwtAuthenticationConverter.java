@@ -25,8 +25,6 @@ import java.util.stream.Stream;
 public class CustomJwtAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        private static final Logger logger = LoggerFactory.getLogger(CustomJwtAuthenticationConverter.class);
-
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -56,6 +54,7 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
             throw new BadCredentialsException("Invalid role: " + role);
         }
     }
+
     public static UUID extractUserIdFromContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof JwtAuthenticationToken) {

@@ -22,7 +22,6 @@ public class JwksController {
     }
 
     @GetMapping("/.well-known/jwks.json")
-
     public Map<String, Object> jwks() {
         JWKSet jwkSet = new JWKSet(rsaKey);
         return jwkSet.toJSONObject();
