@@ -2,7 +2,6 @@ package net.atos.service;
 
 import net.atos.dto.DocumentEditDto;
 import net.atos.dto.DocumentReadOnlyDto;
-import net.atos.exception.YouDoNotHaveThePermissions;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;

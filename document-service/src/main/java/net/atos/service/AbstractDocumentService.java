@@ -6,7 +6,6 @@ import net.atos.dto.DocumentCreateDto;
 import net.atos.dto.DocumentEditDto;
 import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.exception.DocumentNotFoundException;
-import net.atos.exception.FileStorageException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -16,13 +15,16 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -31,24 +33,22 @@ public abstract class AbstractDocumentService {
     protected final DocumentRepository repository;
     protected final LocalFileStorageService fileStorageService;
 
+    @Transactional
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
+        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+
+        String sanitizedFileName = sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
+        String relativePath = generateRelativePath(userId, extractDirectory(createDto.getFilePath()));
+
         DocumentEntity documentEntity = new DocumentEntity(
-                createDto.getFilePath(),
+                sanitizedFileName,
                 createDto.getType(),
                 createDto.getSizeInBytes(),
-                CustomJwtAuthenticationConverter.extractUserIdFromContext()
+                userId
         );
         repository.save(documentEntity);
 
-        try {
-            fileStorageService.storeFile(createDto.getFile(),
-                    createDto.getFilePath(),
-                    documentEntity.getId());
-        } catch (FileStorageException e) {
-            // If file storage fails, delete the database entry
-            repository.delete(documentEntity);
-            throw e;
-        }
+        fileStorageService.storeFile(createDto.getFile(), relativePath, sanitizedFileName);
 
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
@@ -131,5 +131,21 @@ public abstract class AbstractDocumentService {
             throw new FileNotFoundException("Could not read file: " + document.getFilePath());
     }
 
+    private String sanitizeFileName(String fileName) {
+        return fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+    }
 
+    private String generateRelativePath(UUID userId, String fileName) {
+        return Paths.get(userId.toString(), fileName).toString();
+    }
+
+    public static String extractFileName(String fullFilePath) {
+        Path path = Paths.get(fullFilePath);
+        return path.getFileName().toString();
+    }
+    public static String extractDirectory(String fullFilePath) {
+        Path path = Paths.get(fullFilePath);
+        Path parent = path.getParent();
+        return parent != null ? parent.toString() : "";
+    }
 }

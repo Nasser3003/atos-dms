@@ -31,7 +31,7 @@ public class LocalFileStorageService {
         }
     }
 
-    public void storeFile(MultipartFile file, String userSpecifiedPath, UUID documentId) throws FileStorageException {
+    public void storeFile(MultipartFile file, String userSpecifiedPath, String sanitizedFileName) throws FileStorageException {
         if (file.isEmpty())
             throw new FileStorageException("Failed to store empty file.");
 
@@ -39,7 +39,7 @@ public class LocalFileStorageService {
 
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fileExtension = StringUtils.getFilenameExtension(originalFilename);
-        String fileNameOnDisk = documentId + (fileExtension != null ? "." + fileExtension : "");
+        String fileNameOnDisk = sanitizedFileName + (fileExtension != null ? "." + fileExtension : "");
 
         try {
             Files.createDirectories(fullPath);
