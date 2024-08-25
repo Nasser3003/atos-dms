@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
-
 @Service
 public class DocumentAdminService extends AbstractDocumentService {
 
@@ -49,9 +47,7 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
-        Path documentPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId(),
-                documentEntity.getFilePath());
+        Path documentPath = fileStorageService.getFilePathById(id);
 
         fileStorageService.deleteFile(documentPath.toString());
         repository.deleteById(id);

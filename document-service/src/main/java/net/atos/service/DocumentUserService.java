@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
-
 @Service
 public class DocumentUserService extends AbstractDocumentService {
 
@@ -72,16 +70,12 @@ public class DocumentUserService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
-
-        Path documentPath = concatPathToUserIdFolder(CustomJwtAuthenticationConverter.extractUserIdFromContext(),
-                documentEntity.getFilePath());
-
-        if (NotFileOwner(documentEntity))
+        if (NotFileOwner(findDocumentById(id)))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
+
+        Path documentPath = fileStorageService.getFilePathById(id);
 
         fileStorageService.deleteFile(documentPath.toString());
         repository.deleteById(id);
     }
-
 }

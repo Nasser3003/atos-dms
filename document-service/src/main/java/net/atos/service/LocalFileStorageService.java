@@ -15,16 +15,18 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
+
 @Service
 public class LocalFileStorageService {
 
     private final Path baseStorageLocation;
-    private final AbstractDocumentService abstractDocumentService;
+    private final DocumentRepository documentRepository;
 
     @Autowired
-    public LocalFileStorageService(@Value("${file.storage.location}") String baseStorageLocation, AbstractDocumentService documentService) {
+    public LocalFileStorageService(@Value("${file.storage.location}") String baseStorageLocation, DocumentRepository documentRepository) {
         this.baseStorageLocation = Paths.get(baseStorageLocation).toAbsolutePath().normalize();
-        this.abstractDocumentService = documentService;
+        this.documentRepository = documentRepository;
         try {
             Files.createDirectories(this.baseStorageLocation);
         } catch (IOException ex) {
@@ -52,20 +54,22 @@ public class LocalFileStorageService {
         }
     }
 
-    public Path getFilePath(UUID documentId) throws FileStorageException {
+    public Path getFilePathById(UUID documentId) throws FileStorageException {
 
-        DocumentEntity documentEntity = abstractDocumentService.findDocumentById(documentId);
+        DocumentEntity documentEntity = documentRepository.findById(documentId).orElseThrow(
+                () -> new FileStorageException("Document not found."));
 
-        Path fullPath = validateAndNormalizePath(userSpecifiedPath);
+        Path fullPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId(), documentEntity.getFilePath());
+        Path validatedPath = validateAndNormalizePath(fullPath.toString());
 
 
-        try (Stream<Path> pathStream = Files.walk(fullPath.getParent(), 1)) {
+        try (Stream<Path> pathStream = Files.walk(validatedPath.getParent(), 1)) {
             return pathStream
-                    .filter(file -> file.getFileName().toString().equals(fullPath.getFileName().toString()))
+                    .filter(file -> file.getFileName().toString().equals(validatedPath.getFileName().toString()))
                     .findFirst()
-                    .orElseThrow(() -> new FileStorageException("File not found: " + fullPath.getFileName()));
+                    .orElseThrow(() -> new FileStorageException("File not found: " + validatedPath.getFileName()));
         } catch (IOException ex) {
-            throw new FileStorageException("Error accessing file: " + fullPath.getFileName(), ex);
+            throw new FileStorageException("Error accessing file: " + validatedPath.getFileName(), ex);
         }
     }
 

@@ -115,7 +115,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
     ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {
 
-        Path filePath = fileStorageService.getFilePath(document.getId());
+        Path filePath = fileStorageService.getFilePathById(document.getId());
 
         Resource resource = new UrlResource(filePath.toUri());
 
