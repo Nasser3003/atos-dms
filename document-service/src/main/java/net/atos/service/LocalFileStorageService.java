@@ -41,11 +41,9 @@ public class LocalFileStorageService {
         Path fullPath = validateAndNormalizePath(userSpecifiedPath);
 
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String fileNameOnDisk = sanitizedFileName + (originalFilename);
-
         try {
             Files.createDirectories(fullPath);
-            Path targetLocation = fullPath.resolve(fileNameOnDisk);
+            Path targetLocation = fullPath.resolve(sanitizedFileName);
             Files.copy(file.getInputStream(), targetLocation);
         } catch (IOException ex) {
             if (ex instanceof FileAlreadyExistsException)

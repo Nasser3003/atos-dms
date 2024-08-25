@@ -50,9 +50,9 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 createDto.getSizeInBytes(),
                 userId
         );
-        repository.save(documentEntity);
 
         fileStorageService.storeFile(createDto.getFile(), relativePath, sanitizedFileName);
+        repository.save(documentEntity);
 
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
