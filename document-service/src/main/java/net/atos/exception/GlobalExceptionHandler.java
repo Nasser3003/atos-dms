@@ -54,6 +54,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Permission denied", ex.getMessage());
     }
 
+    @ExceptionHandler(AttributeException.class)
+    public ResponseEntity<Object> handleAttributeException(AttributeException ex) {
+        logger.error("Unexpected error: ", ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Issue with attribute", "Please contact support if the problem persists");
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         logger.error("Unexpected error: ", ex);

@@ -27,12 +27,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static net.atos.util.FilePath.extractDirectory;
+import static net.atos.util.FilePath.extractFileName;
+
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public abstract class AbstractDocumentService {
+public abstract class AbstractDocumentService implements IDocumentService {
 
     protected final DocumentRepository repository;
     protected final LocalFileStorageService fileStorageService;
 
+    @Override
     @Transactional
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
@@ -61,13 +65,13 @@ public abstract class AbstractDocumentService {
 
     public abstract void deleteDocument(UUID id);
 
+    public abstract ResponseEntity<Resource> downloadDocument(UUID id);
+
     boolean NotFileOwner(DocumentEntity document) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         return !document.getCreatedByUserId().equals(userId);
     }
-
-    public abstract ResponseEntity<Resource> downloadDocument(UUID id);
-
+    
     DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
@@ -139,13 +143,4 @@ public abstract class AbstractDocumentService {
         return Paths.get(userId.toString(), fileName).toString();
     }
 
-    public static String extractFileName(String fullFilePath) {
-        Path path = Paths.get(fullFilePath);
-        return path.getFileName().toString();
-    }
-    public static String extractDirectory(String fullFilePath) {
-        Path path = Paths.get(fullFilePath);
-        Path parent = path.getParent();
-        return parent != null ? parent.toString() : "";
-    }
 }

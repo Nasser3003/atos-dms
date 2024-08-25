@@ -24,16 +24,16 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
-    public DocumentReadOnlyDto getDocument(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
-        return DocumentMapper.mapToReadDocument(documentEntity);
-    }
-
-    @Override
     public List<DocumentReadOnlyDto> getAllDocuments() {
         return repository.findAll().stream()
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public DocumentReadOnlyDto getDocument(UUID id) {
+        DocumentEntity documentEntity = findDocumentById(id);
+        return DocumentMapper.mapToReadDocument(documentEntity);
     }
 
     @Override

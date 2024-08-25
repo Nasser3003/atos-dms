@@ -1,6 +1,7 @@
 package net.atos.model;
 
 import lombok.*;
+import net.atos.exception.AttributeException;
 import net.atos.model.enums.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
@@ -112,18 +113,17 @@ public class DocumentEntity {
         }
     }
 
-    public DocumentEntity addAttribute(String key, String value) {
+    public void addAttribute(String key, String value) {
         if (key == null || key.isEmpty())
-            throw new IllegalArgumentException("Attribute key cannot be null or empty");
+            throw new AttributeException("Attribute key cannot be null or empty");
 
         if (value == null)
-            throw new IllegalArgumentException("Attribute value cannot be null");
+            throw new AttributeException("Attribute value cannot be null");
 
         if (attributes.containsKey(key))
-            throw new IllegalArgumentException("Attribute already exists: " + key);
+            throw new AttributeException("Attribute already exists: " + key);
 
         attributes.put(key, value);
-        return this;
     }
 
     public DocumentEntity removeAttribute(String key) {
