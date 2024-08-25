@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.naming.AuthenticationException;
+import java.nio.file.FileAlreadyExistsException;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -59,6 +60,18 @@ public class GlobalExceptionHandler {
         logger.error("Unexpected error: ", ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Issue with attribute", "Please contact support if the problem persists");
     }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logger.error("Unexpected error: ", ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Issue with", ex.getMessage());
+    }
+
+    @ExceptionHandler(FileAlreadyExistsException.class)
+    public ResponseEntity<Object> handleFileAlreadyExistsException(FileAlreadyExistsException ex) {
+        logger.error("Unexpected error: ", ex);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleException(Exception ex) {
         logger.error("Unexpected error: ", ex);

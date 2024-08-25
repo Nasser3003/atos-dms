@@ -9,6 +9,7 @@ import net.atos.exception.DocumentNotFoundException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
+import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -21,14 +22,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static net.atos.util.FilePath.extractDirectory;
-import static net.atos.util.FilePath.extractFileName;
+import static net.atos.util.LocalFileUtil.extractDirectory;
+import static net.atos.util.LocalFileUtil.extractFileName;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public abstract class AbstractDocumentService implements IDocumentService {
@@ -42,7 +42,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
 
         String sanitizedFileName = sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
-        String relativePath = generateRelativePath(userId, extractDirectory(createDto.getFilePath()));
+        String relativePath = LocalFileUtil.concatPathToUserIdFolder(userId, extractDirectory(createDto.getFilePath())).toString();
 
         DocumentEntity documentEntity = new DocumentEntity(
                 sanitizedFileName,
@@ -71,7 +71,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         return !document.getCreatedByUserId().equals(userId);
     }
-    
+
     DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
@@ -113,10 +113,9 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
     }
 
-    ResponseEntity<Resource> downloadDocumentHelper(UUID id, DocumentEntity document) throws IOException {
+    ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {
 
-        Path filePath = fileStorageService.getFilePath(document.getId(),
-                document.getFilePath());
+        Path filePath = fileStorageService.getFilePath(document.getId());
 
         Resource resource = new UrlResource(filePath.toUri());
 
@@ -139,8 +138,5 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
 
-    private String generateRelativePath(UUID userId, String fileName) {
-        return Paths.get(userId.toString(), fileName).toString();
-    }
 
 }

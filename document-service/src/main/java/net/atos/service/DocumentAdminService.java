@@ -11,9 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
 
 @Service
 public class DocumentAdminService extends AbstractDocumentService {
@@ -46,7 +49,11 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        findDocumentById(id);
+        DocumentEntity documentEntity = findDocumentById(id);
+        Path documentPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId(),
+                documentEntity.getFilePath());
+
+        fileStorageService.deleteFile(documentPath.toString());
         repository.deleteById(id);
     }
 
@@ -55,7 +62,7 @@ public class DocumentAdminService extends AbstractDocumentService {
         DocumentEntity document = findDocumentById(id);
 
         try {
-            return downloadDocumentHelper(id, document);
+            return downloadDocumentHelper(document);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

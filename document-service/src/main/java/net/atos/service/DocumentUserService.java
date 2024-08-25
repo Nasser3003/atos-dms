@@ -13,9 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
 
 @Service
 public class DocumentUserService extends AbstractDocumentService {
@@ -32,7 +35,7 @@ public class DocumentUserService extends AbstractDocumentService {
             throw new YouDoNotHaveThePermissions("You don't have the privileges to download Document with id " + id);
 
         try {
-            return downloadDocumentHelper(id, document);
+            return downloadDocumentHelper(document);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -70,9 +73,14 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public void deleteDocument(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
+
+        Path documentPath = concatPathToUserIdFolder(CustomJwtAuthenticationConverter.extractUserIdFromContext(),
+                documentEntity.getFilePath());
+
         if (NotFileOwner(documentEntity))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
 
+        fileStorageService.deleteFile(documentPath.toString());
         repository.deleteById(id);
     }
 
