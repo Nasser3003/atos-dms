@@ -33,8 +33,8 @@ import static net.atos.util.LocalFileUtil.extractFileName;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public abstract class AbstractDocumentService implements IDocumentService {
 
-    protected final DocumentRepository repository;
-    protected final LocalFileStorageService fileStorageService;
+    final DocumentRepository repository;
+    final LocalFileStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -98,13 +98,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
         );
     }
 
-    DocumentEntity findNoneDeletedDocumentById(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
-        if (documentEntity.isDeleted())
-            throw new FileNotFoundException("file doesnt exist or already deleted");
-        return documentEntity;
-    }
-
     ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {
 
         Path filePath = fileStorageService.getFilePathById(document.getId());
@@ -124,6 +117,13 @@ public abstract class AbstractDocumentService implements IDocumentService {
         }
         else
             throw new FileNotFoundException("Could not read file: " + document.getFilePath());
+    }
+
+    DocumentEntity findNoneDeletedDocumentById(UUID id) {
+        DocumentEntity documentEntity = findDocumentById(id);
+        if (documentEntity.isDeleted())
+            throw new FileNotFoundException("file doesnt exist or is deleted");
+        return documentEntity;
     }
 
     private DocumentEntity findDocumentById(UUID id) {

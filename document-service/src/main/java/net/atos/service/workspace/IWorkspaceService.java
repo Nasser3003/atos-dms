@@ -1,7 +1,7 @@
 package net.atos.service.workspace;
 
-import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.workspace.WorkspaceCreateDto;
+import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,11 @@ public interface IWorkspaceService {
 
     WorkspaceReadDto createWorkspace(WorkspaceCreateDto createDto);
 
-    List<WorkspaceCreateDto> getAllWorkspaces();
+    List<WorkspaceReadDto> getAllWorkspaces();
 
     WorkspaceReadDto getWorkspace(UUID id);
 
-    WorkspaceReadDto updateWorkspace(DocumentEditDto documentEditDto);
+    WorkspaceReadDto updateWorkspace(WorkspaceEditDto workspaceEditDto);
 
     void deleteWorkspace(UUID id);
 

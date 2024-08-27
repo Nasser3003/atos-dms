@@ -2,34 +2,48 @@ package net.atos.service.workspace;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
-import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.workspace.WorkspaceCreateDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.exception.DocumentNotFoundException;
+import net.atos.exception.FileNotFoundException;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
+import net.atos.repository.WorkspaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public abstract class AbstractWorkspaceService implements IWorkspaceService {
 
+    final WorkspaceRepository repository;
+
     @Override
+    @Transactional
     public WorkspaceReadDto createWorkspace(WorkspaceCreateDto createDto) {
         WorkspaceEntity workspaceEntity = new WorkspaceEntity(createDto.getName(), createDto.getDescription(),
                 CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        repository.save(workspaceEntity);
         return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
      }
 
-    List<WorkspaceCreateDto> getAllWorkspaces();
+    boolean NotWorkspaceOwner(WorkspaceEntity workspaceEntity) {
+        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        return !workspaceEntity.getCreatedByUserId().equals(userId);
+    }
 
-    WorkspaceReadDto getWorkspace(UUID id);
+    WorkspaceEntity findNoneDeletedWorkspace(UUID id) {
+        WorkspaceEntity workspaceEntity = findWorkspaceById(id);
+        if (workspaceEntity.isDeleted())
+            throw new FileNotFoundException("Workspace doesnt exist or is deleted");
+        return workspaceEntity;
+    }
 
-    WorkspaceReadDto updateWorkspace(DocumentEditDto documentEditDto);
+    private WorkspaceEntity findWorkspaceById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new DocumentNotFoundException("Workspace with id " + id + " not found"));
 
-    void deleteWorkspace(UUID id);
+    }
 
 }

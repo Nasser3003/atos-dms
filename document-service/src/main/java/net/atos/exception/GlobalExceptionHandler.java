@@ -49,8 +49,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "File storage error", ex.getMessage());
     }
 
-    @ExceptionHandler(YouDoNotHaveThePermissions.class)
-    public ResponseEntity<Object> handleYouDoNotHaveThePermissions(YouDoNotHaveThePermissions ex) {
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Object> handleYouDoNotHaveThePermissions(UnauthorizedException ex) {
         logger.error("Permission denied: ", ex);
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Permission denied", ex.getMessage());
     }

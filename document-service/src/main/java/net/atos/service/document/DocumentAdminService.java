@@ -62,7 +62,9 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        findNoneDeletedDocumentById(id).setDeleted(true);
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
+        documentEntity.setDeleted(true);
+        repository.save(documentEntity);
     }
 
     @Override

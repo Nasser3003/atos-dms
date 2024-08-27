@@ -99,6 +99,14 @@ public class DocumentEntity {
     @Setter(AccessLevel.NONE)
     private Map<String, String> attributes = new HashMap<>();
 
+    public boolean isUserUnauthorized(UUID id) {
+        if (id == null)
+            throw new IllegalArgumentException("User id cannot be null");
+        if (createdByUserId == id)
+            return false;
+        return !accessibleByUsers.contains(id);
+    }
+
     public Set<WorkspaceEntity> getWorkspaces() {
         return new HashSet<>(workspaces);
     }
@@ -180,7 +188,7 @@ public class DocumentEntity {
         return this;
     }
 
-    public boolean hasUserAccess(String email) {
+    public boolean isUserUnauthorized(String email) {
         if (email == null || email.isEmpty())
             throw new IllegalArgumentException("User email cannot be null or empty");
 

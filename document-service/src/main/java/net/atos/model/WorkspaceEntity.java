@@ -53,6 +53,8 @@ public class WorkspaceEntity {
     @Setter(AccessLevel.NONE)
     private Set<UUID> accessibleByUsers = new HashSet<>();
 
+    private boolean isDeleted = false;
+
     public void addUser(UUID id) {
         if (id == null)
             throw new IllegalArgumentException("User id cannot be null");
@@ -70,10 +72,12 @@ public class WorkspaceEntity {
         return this;
     }
 
-    public boolean hasUserAccess(UUID id) {
+    public boolean isUserUnauthorized(UUID id) {
         if (id == null)
             throw new IllegalArgumentException("User id cannot be null");
-        return accessibleByUsers.contains(id);
+        if (createdByUserId == id)
+            return true;
+        return !accessibleByUsers.contains(id);
     }
 
     public Set<UUID> getAccessibleUsers() {
