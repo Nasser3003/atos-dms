@@ -34,13 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Object> handleFileNotFoundException(NotFoundException ex) {
         logger.error("File not found: ", ex);
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "File not found", ex.getMessage());
-    }
-
-    @ExceptionHandler(DocumentNotFoundException.class)
-    public ResponseEntity<Object> handleDocumentNotFoundException(DocumentNotFoundException ex) {
-        logger.error("Document not found: ", ex);
-        return buildErrorResponse(HttpStatus.NOT_FOUND, "Document not found", ex.getMessage());
+        return buildErrorResponse(HttpStatus.NOT_FOUND, "Entity not found", ex.getMessage());
     }
 
     @ExceptionHandler(FileStorageException.class)

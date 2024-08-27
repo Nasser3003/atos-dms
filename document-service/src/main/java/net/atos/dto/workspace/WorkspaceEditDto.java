@@ -20,4 +20,4 @@ public class WorkspaceEditDto {
 
     @NotBlank(message = "Description cannot be blank")
     private String description;
-}}
+}

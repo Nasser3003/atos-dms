@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public abstract class AbstractDocumentController {
 
-    protected final IDocumentService documentService;
+    final IDocumentService documentService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentReadOnlyDto> createDocument(
