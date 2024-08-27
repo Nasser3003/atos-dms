@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,8 +31,23 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocuments() {
+        return repository.findAll().stream()
+                .filter(f -> !f.isDeleted())
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllDeletedDocuments() {
+        return repository.findAll().stream()
+            .filter(DocumentEntity::isDeleted)
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());    }
+
+    @Override
     public DocumentReadOnlyDto getDocument(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
 
@@ -47,15 +61,12 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        Path documentPath = fileStorageService.getFilePathById(id);
-
-        fileStorageService.deleteFile(documentPath.toString());
-        repository.deleteById(id);
+        findNoneDeletedDocumentById(id).setDeleted(true);
     }
 
     @Override
     public ResponseEntity<Resource> downloadDocument(UUID id) {
-        DocumentEntity document = findDocumentById(id);
+        DocumentEntity document = findNoneDeletedDocumentById(id);
 
         try {
             return downloadDocumentHelper(document);

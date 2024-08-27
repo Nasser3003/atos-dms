@@ -6,6 +6,7 @@ import net.atos.dto.DocumentCreateDto;
 import net.atos.dto.DocumentEditDto;
 import net.atos.dto.DocumentReadOnlyDto;
 import net.atos.exception.DocumentNotFoundException;
+import net.atos.exception.FileNotFoundException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,6 +59,10 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
     public abstract List<DocumentReadOnlyDto> getAllDocuments();
 
+    public abstract List<DocumentReadOnlyDto> getAllNoneDeletedDocuments();
+
+    public abstract List<DocumentReadOnlyDto> getAllDeletedDocuments();
+
     public abstract DocumentReadOnlyDto getDocument(UUID id);
 
     public abstract DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto);
@@ -76,7 +80,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
 
-        DocumentEntity entity = findDocumentById(documentEditDto.getId());
+        DocumentEntity entity = findNoneDeletedDocumentById(documentEditDto.getId());
 
         entity.setFilePath(documentEditDto.getFilePath());
         entity.setType(documentEditDto.getType());
@@ -108,7 +112,14 @@ public abstract class AbstractDocumentService implements IDocumentService {
         );
     }
 
-    DocumentEntity findDocumentById(UUID id) {
+    DocumentEntity findNoneDeletedDocumentById(UUID id) {
+        DocumentEntity documentEntity = findDocumentById(id);
+        if (documentEntity.isDeleted())
+            throw new FileNotFoundException("file doesnt exist or already deleted");
+        return documentEntity;
+    }
+
+    private DocumentEntity findDocumentById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
     }

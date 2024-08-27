@@ -81,6 +81,8 @@ public class DocumentEntity {
 
     private boolean isPublic = false;
 
+    private boolean isDeleted = false;
+
     @Field("thumbnail_path")
     private String thumbnailPath;
 

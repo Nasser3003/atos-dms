@@ -13,10 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentUserService extends AbstractDocumentService {
@@ -28,7 +27,7 @@ public class DocumentUserService extends AbstractDocumentService {
 
     @Override
     public ResponseEntity<Resource> downloadDocument(UUID id) {
-        DocumentEntity document = findDocumentById(id);
+        DocumentEntity document = findNoneDeletedDocumentById(id);
         if (NotFileOwner(document))
             throw new YouDoNotHaveThePermissions("You don't have the privileges to download Document with id " + id);
 
@@ -41,18 +40,39 @@ public class DocumentUserService extends AbstractDocumentService {
 
     @Override
     public List<DocumentReadOnlyDto> getAllDocuments() {
-        List<DocumentEntity> allFiles = repository.findAll();
-        List<DocumentReadOnlyDto> documentReadOnlyDtos = new ArrayList<>();
-        for (DocumentEntity entity : allFiles) {
-            if (entity.getCreatedByUserId() == CustomJwtAuthenticationConverter.extractUserIdFromContext())
-                documentReadOnlyDtos.add(DocumentMapper.mapToReadDocument(entity));
-        }
-        return documentReadOnlyDtos;
+        UUID currentUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+
+        return repository.findAll().stream()
+                .filter(f -> !f.isDeleted())
+                .filter(f -> f.getCreatedByUserId().equals(currentUserId))
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());
     }
 
     @Override
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocuments() {
+        UUID currentUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+
+        return repository.findAll().stream()
+                .filter(f -> !f.isDeleted())
+                .filter(f -> f.getCreatedByUserId().equals(currentUserId))
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllDeletedDocuments() {
+        UUID currentUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+
+        return repository.findAll().stream()
+                .filter(DocumentEntity::isDeleted)
+                .filter(f -> f.getCreatedByUserId().equals(currentUserId))
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());    }
+
+    @Override
     public DocumentReadOnlyDto getDocument(UUID id) {
-        DocumentEntity documentEntity = findDocumentById(id);
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         if (NotFileOwner(documentEntity))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
         return DocumentMapper.mapToReadDocument(documentEntity);
@@ -61,7 +81,7 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto) {
         UUID id = documentEditDto.getId();
-        DocumentEntity entity = findDocumentById(id);
+        DocumentEntity entity = findNoneDeletedDocumentById(id);
         if (NotFileOwner(entity))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
 
@@ -70,12 +90,9 @@ public class DocumentUserService extends AbstractDocumentService {
 
     @Override
     public void deleteDocument(UUID id) {
-        if (NotFileOwner(findDocumentById(id)))
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
+        if (NotFileOwner(documentEntity))
             throw new YouDoNotHaveThePermissions("don't have the privileges for Document with id " + id);
-
-        Path documentPath = fileStorageService.getFilePathById(id);
-
-        fileStorageService.deleteFile(documentPath.toString());
-        repository.deleteById(id);
+        documentEntity.setDeleted(true);
     }
 }
