@@ -61,7 +61,7 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        if (documentEntity.isUserUnauthorized(id))
+        if (!documentEntity.isUserAuthorized(id))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
@@ -88,7 +88,7 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public ResponseEntity<Resource> downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        if (documentEntity.isUserUnauthorized(id))
+        if (!documentEntity.isUserAuthorized(id))
             throw new UnauthorizedException("You don't have the privileges to download Document with id " + id);
 
         try {

@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.workspace.WorkspaceCreateDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
-import net.atos.exception.DocumentNotFoundException;
-import net.atos.exception.FileNotFoundException;
+import net.atos.exception.NotFoundException;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
+import net.atos.repository.DocumentRepository;
 import net.atos.repository.WorkspaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +18,7 @@ import java.util.UUID;
 public abstract class AbstractWorkspaceService implements IWorkspaceService {
 
     final WorkspaceRepository repository;
+    final DocumentRepository documentRepository;
 
     @Override
     @Transactional
@@ -36,13 +37,13 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
     WorkspaceEntity findNoneDeletedWorkspace(UUID id) {
         WorkspaceEntity workspaceEntity = findWorkspaceById(id);
         if (workspaceEntity.isDeleted())
-            throw new FileNotFoundException("Workspace doesnt exist or is deleted");
+            throw new NotFoundException("Workspace doesnt exist or is deleted");
         return workspaceEntity;
     }
 
     private WorkspaceEntity findWorkspaceById(UUID id) {
         return repository.findById(id)
-                .orElseThrow(() -> new DocumentNotFoundException("Workspace with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Workspace with id " + id + " not found"));
 
     }
 

@@ -13,6 +13,10 @@ public interface IWorkspaceService {
 
     WorkspaceReadDto createWorkspace(WorkspaceCreateDto createDto);
 
+    WorkspaceReadDto addDocument(UUID documentId, UUID workspaceId);
+
+    WorkspaceReadDto removeDocument(UUID documentId, UUID workspaceId);
+
     List<WorkspaceReadDto> getAllWorkspaces();
 
     WorkspaceReadDto getWorkspace(UUID id);

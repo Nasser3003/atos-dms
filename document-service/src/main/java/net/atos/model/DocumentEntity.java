@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -64,6 +65,7 @@ public class DocumentEntity {
     @NotNull
     @Setter(AccessLevel.NONE)
     @Field("size_in_bytes")
+    @Min(1)
     private Long sizeInBytes;
 
     @NotNull
@@ -99,12 +101,10 @@ public class DocumentEntity {
     @Setter(AccessLevel.NONE)
     private Map<String, String> attributes = new HashMap<>();
 
-    public boolean isUserUnauthorized(UUID id) {
+    public boolean isUserAuthorized(UUID id) {
         if (id == null)
             throw new IllegalArgumentException("User id cannot be null");
-        if (createdByUserId == id)
-            return false;
-        return !accessibleByUsers.contains(id);
+        return createdByUserId.equals(id) || accessibleByUsers.contains(id);
     }
 
     public Set<WorkspaceEntity> getWorkspaces() {
@@ -186,13 +186,6 @@ public class DocumentEntity {
 
         accessibleByUsers.remove(id);
         return this;
-    }
-
-    public boolean isUserUnauthorized(String email) {
-        if (email == null || email.isEmpty())
-            throw new IllegalArgumentException("User email cannot be null or empty");
-
-        return accessibleByUsers.contains(email);
     }
 
     public Set<UUID> getAccessibleByUsers() {

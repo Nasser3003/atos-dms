@@ -72,16 +72,37 @@ public class WorkspaceEntity {
         return this;
     }
 
-    public boolean isUserUnauthorized(UUID id) {
+    public boolean isUserAuthorized(UUID id) {
         if (id == null)
             throw new IllegalArgumentException("User id cannot be null");
-        if (createdByUserId == id)
-            return true;
-        return !accessibleByUsers.contains(id);
+        return createdByUserId.equals(id) || accessibleByUsers.contains(id);
     }
 
     public Set<UUID> getAccessibleUsers() {
         return new HashSet<>(accessibleByUsers);
+    }
+
+    public void addDocument(DocumentEntity document) {
+        if (document == null)
+            throw new IllegalArgumentException("Document cannot be null");
+
+        if (documents.contains(document))
+            throw new IllegalArgumentException("Document already exists in this workspace: " + document.getId());
+
+        documents.add(document);
+        document.getWorkspaces().add(this);
+    }
+
+    public WorkspaceEntity removeDocument(DocumentEntity document) {
+        if (document == null)
+            throw new IllegalArgumentException("Document cannot be null");
+
+        if (!documents.contains(document))
+            throw new IllegalArgumentException("Document does not exist in this workspace: " + document.getId());
+
+        documents.remove(document);
+        document.getWorkspaces().remove(this);
+        return this;
     }
 
 }

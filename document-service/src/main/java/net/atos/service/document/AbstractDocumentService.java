@@ -5,8 +5,7 @@ import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.document.DocumentCreateDto;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
-import net.atos.exception.DocumentNotFoundException;
-import net.atos.exception.FileNotFoundException;
+import net.atos.exception.NotFoundException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -116,19 +115,19 @@ public abstract class AbstractDocumentService implements IDocumentService {
                     .body(resource);
         }
         else
-            throw new FileNotFoundException("Could not read file: " + document.getFilePath());
+            throw new NotFoundException("Could not read file: " + document.getFilePath());
     }
 
     DocumentEntity findNoneDeletedDocumentById(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
         if (documentEntity.isDeleted())
-            throw new FileNotFoundException("file doesnt exist or is deleted");
+            throw new NotFoundException("file doesnt exist or is deleted");
         return documentEntity;
     }
 
     private DocumentEntity findDocumentById(UUID id) {
         return repository.findById(id)
-                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
+                .orElseThrow(() -> new NotFoundException("Document with id " + id + " not found"));
 
     }
 

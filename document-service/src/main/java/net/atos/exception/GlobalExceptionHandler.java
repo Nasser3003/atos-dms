@@ -31,8 +31,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication failed", ex.getMessage());
     }
 
-    @ExceptionHandler(FileNotFoundException.class)
-    public ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleFileNotFoundException(NotFoundException ex) {
         logger.error("File not found: ", ex);
         return buildErrorResponse(HttpStatus.NOT_FOUND, "File not found", ex.getMessage());
     }
