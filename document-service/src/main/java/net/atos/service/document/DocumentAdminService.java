@@ -1,10 +1,11 @@
-package net.atos.service;
+package net.atos.service.document;
 
-import net.atos.dto.DocumentEditDto;
-import net.atos.dto.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentEditDto;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
+import net.atos.service.LocalFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;

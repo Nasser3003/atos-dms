@@ -1,15 +1,16 @@
-package net.atos.service;
+package net.atos.service.document;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
-import net.atos.dto.DocumentCreateDto;
-import net.atos.dto.DocumentEditDto;
-import net.atos.dto.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentCreateDto;
+import net.atos.dto.document.DocumentEditDto;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.exception.DocumentNotFoundException;
 import net.atos.exception.FileNotFoundException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
+import net.atos.service.LocalFileStorageService;
 import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -23,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -56,20 +56,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
-
-    public abstract List<DocumentReadOnlyDto> getAllDocuments();
-
-    public abstract List<DocumentReadOnlyDto> getAllNoneDeletedDocuments();
-
-    public abstract List<DocumentReadOnlyDto> getAllDeletedDocuments();
-
-    public abstract DocumentReadOnlyDto getDocument(UUID id);
-
-    public abstract DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto);
-
-    public abstract void deleteDocument(UUID id);
-
-    public abstract ResponseEntity<Resource> downloadDocument(UUID id);
 
     boolean NotFileOwner(DocumentEntity document) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
@@ -119,11 +105,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return documentEntity;
     }
 
-    private DocumentEntity findDocumentById(UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
-    }
-
     ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {
 
         Path filePath = fileStorageService.getFilePathById(document.getId());
@@ -145,9 +126,14 @@ public abstract class AbstractDocumentService implements IDocumentService {
             throw new FileNotFoundException("Could not read file: " + document.getFilePath());
     }
 
+    private DocumentEntity findDocumentById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new DocumentNotFoundException("Document with id " + id + " not found"));
+
+    }
+
     private String sanitizeFileName(String fileName) {
         return fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
-
 
 }

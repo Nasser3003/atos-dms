@@ -1,6 +1,6 @@
 package net.atos.mapper;
 
-import net.atos.dto.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.model.DocumentEntity;
 
 public class DocumentMapper {

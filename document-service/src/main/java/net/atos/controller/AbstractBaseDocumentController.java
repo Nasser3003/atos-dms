@@ -1,11 +1,12 @@
 package net.atos.controller;
 
 import lombok.RequiredArgsConstructor;
-import net.atos.dto.DocumentCreateDto;
-import net.atos.dto.DocumentEditDto;
-import net.atos.dto.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentCreateDto;
+import net.atos.dto.document.DocumentEditDto;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.model.enums.EnumDataType;
-import net.atos.service.IDocumentService;
+import net.atos.service.document.IDocumentService;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,4 +42,7 @@ public abstract class AbstractBaseDocumentController {
 
     @DeleteMapping("/delete/{id}")
     public abstract ResponseEntity<Void> deleteDocument(@PathVariable UUID id);
+
+    @PostMapping("/{id}")
+    public abstract ResponseEntity<Resource> downloadDocument(@PathVariable UUID id);
 }

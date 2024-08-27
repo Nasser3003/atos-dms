@@ -1,10 +1,14 @@
 package net.atos.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.atos.exception.AttributeException;
 import net.atos.model.enums.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotBlank;
@@ -13,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class DocumentEntity {
 
@@ -23,14 +26,12 @@ public class DocumentEntity {
         this.sizeInBytes = sizeInBytes;
         this.createdByUserId = createdByUserId;
         this.lastModifiedByUserId = createdByUserId;
-        this.accessibleByUsers.add(createdByUserId);
         initializeAttributes(type);
     }
 
     @Id
     @Field("document_id")
     @Setter(AccessLevel.NONE)
-    @NotNull
     private UUID id = UUID.randomUUID();
 
     @NotBlank
@@ -44,8 +45,8 @@ public class DocumentEntity {
     @NotBlank
     private EnumDataType type;
 
-    @NotNull
     @Field("date_of_creation")
+    @Setter(AccessLevel.NONE)
     private LocalDateTime dateOfCreation = LocalDateTime.now();
 
     @NotNull
@@ -67,10 +68,12 @@ public class DocumentEntity {
 
     @NotNull
     @Field("created_by_user_id")
+    @Setter(AccessLevel.NONE)
     private UUID createdByUserId;
 
     @NotNull
     @Field("accessible_by_users")
+    @Setter(AccessLevel.NONE)
     private Set<UUID> accessibleByUsers = new HashSet<>();
 
     @NotNull
@@ -86,33 +89,22 @@ public class DocumentEntity {
     @Field("thumbnail_path")
     private String thumbnailPath;
 
+    @DBRef
+    @Setter(AccessLevel.NONE)
+    private Set<WorkspaceEntity> workspaces = new HashSet<>();
+
     private Set<EnumLanguages> languages = new HashSet<>();
 
     @Field("attributes")
+    @Setter(AccessLevel.NONE)
     private Map<String, String> attributes = new HashMap<>();
 
-    private void initializeAttributes(EnumDataType type) {
-        attributes.clear();
-        switch (type) {
-            case VIDEO:
-                for (VideoAttribute attr : VideoAttribute.values())
-                    attributes.put(attr.name(), "");
-                break;
-            case AUDIO:
-                for (AudioAttribute attr : AudioAttribute.values())
-                    attributes.put(attr.name(), "");
-                break;
-            case TEXT:
-                for (TextAttribute attr : TextAttribute.values())
-                    attributes.put(attr.name(), "");
-                break;
-            case IMAGE:
-                for (ImageAttribute attr : ImageAttribute.values())
-                    attributes.put(attr.name(), "");
-                break;
-            default:
-                attributes = new HashMap<>();
-        }
+    public Set<WorkspaceEntity> getWorkspaces() {
+        return new HashSet<>(workspaces);
+    }
+
+    public Map<String, String> getAttributes() {
+        return new HashMap<>(attributes);
     }
 
     public void addAttribute(String key, String value) {
@@ -166,4 +158,61 @@ public class DocumentEntity {
         attributes.put(key, value);
         return this;
     }
+
+    public void addUser(UUID id) {
+        if (id == null)
+            throw new IllegalArgumentException("User id cannot be null or empty");
+
+        if (accessibleByUsers.contains(id))
+            throw new IllegalArgumentException("User already has access: " + id);
+
+        accessibleByUsers.add(id);
+    }
+
+    public DocumentEntity removeUser(UUID id) {
+        if (id == null)
+            throw new IllegalArgumentException("User id cannot be null or empty");
+
+        if (!accessibleByUsers.contains(id))
+            throw new IllegalArgumentException("User does not have access: " + id);
+
+        accessibleByUsers.remove(id);
+        return this;
+    }
+
+    public boolean hasUserAccess(String email) {
+        if (email == null || email.isEmpty())
+            throw new IllegalArgumentException("User email cannot be null or empty");
+
+        return accessibleByUsers.contains(email);
+    }
+
+    public Set<UUID> getAccessibleByUsers() {
+        return new HashSet<>(accessibleByUsers);
+    }
+
+    private void initializeAttributes(EnumDataType type) {
+        attributes.clear();
+        switch (type) {
+            case VIDEO:
+                for (VideoAttribute attr : VideoAttribute.values())
+                    attributes.put(attr.name(), "");
+                break;
+            case AUDIO:
+                for (AudioAttribute attr : AudioAttribute.values())
+                    attributes.put(attr.name(), "");
+                break;
+            case TEXT:
+                for (TextAttribute attr : TextAttribute.values())
+                    attributes.put(attr.name(), "");
+                break;
+            case IMAGE:
+                for (ImageAttribute attr : ImageAttribute.values())
+                    attributes.put(attr.name(), "");
+                break;
+            default:
+                attributes = new HashMap<>();
+        }
+    }
+
 }

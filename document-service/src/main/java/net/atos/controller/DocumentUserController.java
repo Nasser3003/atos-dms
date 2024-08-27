@@ -1,8 +1,8 @@
 package net.atos.controller;
 
-import net.atos.dto.DocumentEditDto;
-import net.atos.dto.DocumentReadOnlyDto;
-import net.atos.service.DocumentUserService;
+import net.atos.dto.document.DocumentEditDto;
+import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.service.document.DocumentUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @PreAuthorize("hasRole('USER')")
-@RequestMapping("/user")
+@RequestMapping("/user/document")
 public class DocumentUserController extends AbstractBaseDocumentController{
 
     @Autowired
@@ -22,17 +22,17 @@ public class DocumentUserController extends AbstractBaseDocumentController{
         super(documentService);
     }
 
-    @GetMapping("/download/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
         return documentService.downloadDocument(id);
     }
 
-    @GetMapping("/documents")
+    @GetMapping("/all")
     public ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
         return ResponseEntity.ok(documentService.getAllDocuments());
     }
 
-    @GetMapping("/document/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.getDocument(id));
     }

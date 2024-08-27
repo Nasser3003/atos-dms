@@ -1,4 +1,4 @@
-package net.atos.dto;
+package net.atos.dto.document;
 
 import lombok.*;
 import net.atos.model.enums.EnumDataType;
