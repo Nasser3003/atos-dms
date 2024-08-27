@@ -1,4 +1,4 @@
-package net.atos.controller;
+package net.atos.controller.document;
 
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RestController
 @PreAuthorize("hasRole('USER')")
 @RequestMapping("/user/document")
-public class DocumentUserController extends AbstractBaseDocumentController{
+public class DocumentUserController extends AbstractDocumentController {
 
     @Autowired
     public DocumentUserController(DocumentUserService documentService) {

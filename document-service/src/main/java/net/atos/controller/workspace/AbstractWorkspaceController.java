@@ -1,4 +1,4 @@
-package net.atos.controller;
+package net.atos.controller.workspace;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.dto.document.DocumentEditDto;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public abstract class AbstractBaseWorkspaceController {
+public abstract class AbstractWorkspaceController {
 
     protected final IWorkspaceService workspaceService;
 

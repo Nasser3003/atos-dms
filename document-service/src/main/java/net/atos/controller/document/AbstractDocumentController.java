@@ -1,4 +1,4 @@
-package net.atos.controller;
+package net.atos.controller.document;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.dto.document.DocumentCreateDto;
@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-public abstract class AbstractBaseDocumentController {
+public abstract class AbstractDocumentController {
 
     protected final IDocumentService documentService;
 

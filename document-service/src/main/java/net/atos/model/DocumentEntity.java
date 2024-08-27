@@ -1,5 +1,6 @@
 package net.atos.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import net.atos.model.enums.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.Min;
@@ -19,6 +21,7 @@ import java.util.*;
 
 @Data
 @NoArgsConstructor
+@Document(collection = "documents")
 public class DocumentEntity {
 
     public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId) {
@@ -93,6 +96,7 @@ public class DocumentEntity {
 
     @DBRef
     @Setter(AccessLevel.NONE)
+    @JsonBackReference
     private Set<WorkspaceEntity> workspaces = new HashSet<>();
 
     private Set<EnumLanguages> languages = new HashSet<>();

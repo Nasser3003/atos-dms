@@ -1,6 +1,10 @@
 package net.atos.model;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -45,7 +49,7 @@ public class WorkspaceEntity {
     private UUID createdByUserId;
 
     @DBRef
-    @ToString.Exclude
+    @JsonManagedReference
     private Set<DocumentEntity> documents = new HashSet<>();
 
     @NotNull
