@@ -53,7 +53,7 @@ public class LocalFileStorageService {
 
     public void renameFile(String oldPath, String newPath) throws FileStorageException {
         Path fullOldPath = validateAndNormalizePath(oldPath);
-        Path fullNewPath = validateAndNormalizePath(newPath).resolve(LocalFileUtil.extractFileName(newPath));
+        Path fullNewPath = validateAndNormalizePath(newPath);
 
         if (Files.exists(fullNewPath))
             throw new FileStorageException("there is a file with the same name at destination : " + newPath);
@@ -82,7 +82,7 @@ public class LocalFileStorageService {
         DocumentEntity documentEntity = documentRepository.findById(documentId).orElseThrow(
                 () -> new FileStorageException("Document not found."));
 
-        Path fullPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId(), documentEntity.getFilePath());
+        Path fullPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId().toString(), documentEntity.getFilePath());
         Path validatedPath = validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(),fullPath.toString());
 
 
@@ -107,19 +107,19 @@ public class LocalFileStorageService {
         }
     }
 
-    private Path validateAndNormalizePath(UUID userId, String relativePath) {
-        if (relativePath == null || relativePath.trim().isEmpty())
-            throw new IllegalArgumentException("Relative path cannot be null or empty");
+    public Path validateAndNormalizePath(UUID userId, String pathInsideUserFolder) {
+        if (pathInsideUserFolder == null || pathInsideUserFolder.trim().isEmpty())
+            throw new IllegalArgumentException("file name cannot be null or empty");
 
         Path userBasePath = baseStorageLocation.resolve(userId.toString());
-        Path inputPath = Path.of(relativePath).normalize();
+        Path normalizedPath = Path.of(pathInsideUserFolder).normalize();
 
-        if (inputPath.startsWith(userBasePath))
-            return inputPath;
-
-        Path normalizedProvidedPath = Path.of(inputPath.startsWith("/") ? inputPath.toString().substring(1) : inputPath.toString());
-        return userBasePath.resolve(normalizedProvidedPath);
+        if (normalizedPath.startsWith(userBasePath))
+            return normalizedPath;
+        return concatPathToUserIdFolder(userBasePath.toString(), normalizedPath.toString());
     }
+
+
     private Path validateAndNormalizePath(String relativePath){
         return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }

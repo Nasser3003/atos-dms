@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-import static net.atos.util.LocalFileUtil.extractDirectory;
 import static net.atos.util.LocalFileUtil.extractFileName;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -41,10 +40,9 @@ public abstract class AbstractDocumentService implements IDocumentService {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
 
         String sanitizedFileName = LocalFileUtil.sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
-        String relativePath = LocalFileUtil.concatPathToUserIdFolder(userId, extractFileName(createDto.getFilePath())).toString();
 
         DocumentEntity documentEntity = new DocumentEntity(
-                fileStorageService.baseStorageLocation.resolve(relativePath).toString(),
+                sanitizedFileName,
                 createDto.getType(),
                 createDto.getSizeInBytes(),
                 userId
@@ -70,10 +68,11 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         entity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
         entity.setLastAccessed(LocalDateTime.now());
-
         String oldPath = findNoneDeletedDocumentById(documentEditDto.getId()).getFilePath();
-        if (!oldPath.equals(documentEditDto.getFilePath()))
-            fileStorageService.renameFile(oldPath, documentEditDto.getFilePath());
+
+        if (documentEditDto.getFilePath() != null && !documentEditDto.getFilePath().isBlank())
+            if (!oldPath.equals(documentEditDto.getFilePath()))
+                fileStorageService.renameFile(oldPath, documentEditDto.getFilePath());
 
         if (documentEditDto.getFilePath() != null)
             entity.setFilePath(fileStorageService.baseStorageLocation

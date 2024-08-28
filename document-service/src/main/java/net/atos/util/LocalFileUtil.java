@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public class LocalFileUtil {
 
-    public static Path concatPathToUserIdFolder(UUID userId, String fileName) {
-        return Paths.get(userId.toString(), fileName);
+    public static Path concatPathToUserIdFolder(String basePath, String path) {
+        return Paths.get(basePath, path);
     }
 
     public static String extractFileName(String fullFilePath) {

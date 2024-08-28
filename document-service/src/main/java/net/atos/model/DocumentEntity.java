@@ -151,6 +151,7 @@ public class DocumentEntity {
     }
 
     public void setType(EnumDataType type) {
+        this.type = type;
         initializeAttributes(type);
     }
 
