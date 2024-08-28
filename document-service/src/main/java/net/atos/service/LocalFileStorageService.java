@@ -8,12 +8,10 @@ import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -75,7 +73,7 @@ public class LocalFileStorageService {
         } catch (FileAlreadyExistsException e) {
             throw new FileStorageException("A file with the new name already exists: " + LocalFileUtil.extractFileName(newPath));
         } catch (IOException e) {
-            throw new FileStorageException("Failed to rename file from " + oldPath + " to " +  LocalFileUtil.extractFileName(newPath), e);
+            throw new FileStorageException("Failed to rename file from " + fullOldPath + " to " +  fullNewPath, e);
         }
     }
 
@@ -118,7 +116,9 @@ public class LocalFileStorageService {
 
         if (inputPath.startsWith(userBasePath))
             return inputPath;
-        return userBasePath.resolve(inputPath);
+
+        Path normalizedProvidedPath = Path.of(inputPath.startsWith("/") ? inputPath.toString().substring(1) : inputPath.toString());
+        return userBasePath.resolve(normalizedProvidedPath);
     }
     private Path validateAndNormalizePath(String relativePath){
         return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);

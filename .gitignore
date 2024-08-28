@@ -32,7 +32,7 @@ build/
 .vscode/
 
 ### Uploaded FIles ###
-.files/**
+files/
 
 ### Mac OS ###
 .DS_Store
