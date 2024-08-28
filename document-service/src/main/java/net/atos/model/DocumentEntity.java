@@ -1,10 +1,7 @@
 package net.atos.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import net.atos.exception.AttributeException;
 import net.atos.model.enums.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +18,7 @@ import java.util.*;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Document(collection = "documents")
 public class DocumentEntity {
 
@@ -199,6 +197,23 @@ public class DocumentEntity {
 
     public Set<UUID> getAccessibleByUsers() {
         return new HashSet<>(accessibleByUsers);
+    }
+
+    public void addWorkspace(WorkspaceEntity workspace) {
+        if (workspace == null)
+            throw new IllegalArgumentException("Workspace cannot be null");
+        if (workspaces.contains(workspace))
+            throw new IllegalArgumentException("Document already exists in this workspace: " + workspace.getId());
+        workspaces.add(workspace);
+    }
+
+    public DocumentEntity removeWorkspace(WorkspaceEntity workspace) {
+        if (workspace == null)
+            throw new IllegalArgumentException("Workspace cannot be null");
+        if (!workspaces.contains(workspace))
+            throw new IllegalArgumentException("Document is not in this workspace: " + workspace.getId());
+        workspaces.remove(workspace);
+        return this;
     }
 
     private void initializeAttributes(EnumDataType type) {

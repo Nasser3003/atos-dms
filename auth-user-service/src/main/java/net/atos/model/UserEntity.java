@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 @Data
 @Entity
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @ToString(exclude = "id")
 @Table(name = "users")
 public class UserEntity implements UserDetails {

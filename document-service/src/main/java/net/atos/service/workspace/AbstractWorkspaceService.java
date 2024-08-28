@@ -63,6 +63,7 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
 
         workspaceEntity.addDocument(documentEntity);
         repository.save(workspaceEntity);
+        documentRepository.save(documentEntity);
         return workspaceEntity;
     }
 
@@ -73,6 +74,7 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
 
         workspaceEntity.removeDocument(documentEntity);
         repository.save(workspaceEntity);
+        documentRepository.save(documentEntity);
         return workspaceEntity;
     }
 

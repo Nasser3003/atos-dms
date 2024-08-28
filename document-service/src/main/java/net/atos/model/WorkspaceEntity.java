@@ -1,10 +1,7 @@
 package net.atos.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +16,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id")
 @Document(collection = "workspaces")
 public class WorkspaceEntity {
 
@@ -94,10 +92,10 @@ public class WorkspaceEntity {
             throw new IllegalArgumentException("Document already exists in this workspace: " + document.getId());
 
         documents.add(document);
-        document.getWorkspaces().add(this);
+        document.addWorkspace(this);
     }
 
-    public WorkspaceEntity removeDocument(DocumentEntity document) {
+    public void removeDocument(DocumentEntity document) {
         if (document == null)
             throw new IllegalArgumentException("Document cannot be null");
 
@@ -105,8 +103,7 @@ public class WorkspaceEntity {
             throw new IllegalArgumentException("Document does not exist in this workspace: " + document.getId());
 
         documents.remove(document);
-        document.getWorkspaces().remove(this);
-        return this;
+        document.removeWorkspace(this);
     }
 
 }
