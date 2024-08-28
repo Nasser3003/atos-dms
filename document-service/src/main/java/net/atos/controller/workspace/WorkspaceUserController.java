@@ -3,6 +3,7 @@ package net.atos.controller.workspace;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.dto.workspace.WorkspaceUserDto;
 import net.atos.service.workspace.WorkspaceUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,12 +58,14 @@ public class WorkspaceUserController extends AbstractWorkspaceController {
     }
 
     @Override
-    ResponseEntity<WorkspaceReadDto> addUserToWorkspace(WorkspaceDocumentDto workspaceDocumentDto) {
-        return null;
+    @PutMapping("/add/user")
+    ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto) {
+        return ResponseEntity.ok(workspaceService.addUser(workspaceUserDto));
     }
 
     @Override
-    ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(WorkspaceDocumentDto workspaceDocumentDto) {
-        return null;
+    @PutMapping("/rm/user")
+    ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto) {
+        return ResponseEntity.ok(workspaceService.removeUser(workspaceUserDto));
     }
 }

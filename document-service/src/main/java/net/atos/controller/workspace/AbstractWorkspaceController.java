@@ -1,10 +1,7 @@
 package net.atos.controller.workspace;
 
 import lombok.RequiredArgsConstructor;
-import net.atos.dto.workspace.WorkspaceCreateDto;
-import net.atos.dto.workspace.WorkspaceDocumentDto;
-import net.atos.dto.workspace.WorkspaceEditDto;
-import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.dto.workspace.*;
 import net.atos.service.workspace.IWorkspaceService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,8 +33,8 @@ public abstract class AbstractWorkspaceController {
 
     abstract ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
 
-    abstract ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+    abstract ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto);
 
-    abstract ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+    abstract ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto);
 
 }
