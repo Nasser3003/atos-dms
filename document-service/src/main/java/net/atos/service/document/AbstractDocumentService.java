@@ -87,24 +87,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         repository.save(entity);
 
-        return new DocumentReadOnlyDto(
-                entity.getId(),
-                entity.getFilePath(),
-                entity.getType(),
-                entity.getSizeInBytes(),
-                entity.getAccessibleByUsers(),
-                entity.getTags(),
-                entity.isPublic(),
-                entity.getThumbnailPath(),
-                entity.getLanguages(),
-                entity.getAttributes(),
-                entity.getDateOfCreation(),
-                entity.getLastAccessed(),
-                entity.getLastModified(),
-                entity.getCreatedByUserId(),
-                entity.getLastModifiedByUserId(),
-                entity.getLastAccessedByUserId()
-        );
+        return DocumentMapper.mapToReadDocument(entity);
     }
 
     ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {

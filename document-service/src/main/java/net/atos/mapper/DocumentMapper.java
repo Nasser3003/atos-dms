@@ -3,11 +3,14 @@ package net.atos.mapper;
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.model.DocumentEntity;
 
+import java.util.stream.Collectors;
+
 public class DocumentMapper {
 
     public static DocumentReadOnlyDto mapToReadDocument (DocumentEntity entity) {
         if (entity == null)
             throw new IllegalArgumentException("Entity cannot be null");
+
 
         return new DocumentReadOnlyDto(
                 entity.getId(),
@@ -25,7 +28,8 @@ public class DocumentMapper {
                 entity.getLastModified(),
                 entity.getCreatedByUserId(),
                 entity.getLastModifiedByUserId(),
-                entity.getLastAccessedByUserId()
+                entity.getLastAccessedByUserId(),
+                entity.getWorkspaces().stream().map(WorkspaceMapper::mapToSimpleWorkspaceDto).collect(Collectors.toSet())
         );
     }
 

@@ -1,6 +1,7 @@
 package net.atos.dto.document;
 
 import lombok.*;
+import net.atos.dto.workspace.WorkspaceSimpleDto;
 import net.atos.model.enums.EnumDataType;
 import net.atos.model.enums.EnumLanguages;
 
@@ -32,5 +33,7 @@ public class DocumentReadOnlyDto {
     private UUID createdByUserId;
     private UUID lastModifiedByUserId;
     private UUID lastAccessedByUserId;
+    private Set<WorkspaceSimpleDto> workspaces;
+
 
 }
