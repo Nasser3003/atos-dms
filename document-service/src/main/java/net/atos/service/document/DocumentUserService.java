@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,6 +68,7 @@ public class DocumentUserService extends AbstractDocumentService {
     }
 
     @Override
+    @Transactional
     public DocumentReadOnlyDto updateDocument(DocumentEditDto documentEditDto) {
         UUID id = documentEditDto.getId();
         DocumentEntity entity = findNoneDeletedDocumentById(id);

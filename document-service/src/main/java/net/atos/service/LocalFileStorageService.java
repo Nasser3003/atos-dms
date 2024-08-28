@@ -1,8 +1,10 @@
 package net.atos.service;
 
+import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.exception.FileStorageException;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
+import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +22,7 @@ import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
 @Service
 public class LocalFileStorageService {
 
-    private final Path baseStorageLocation;
+    public final Path baseStorageLocation;
     private final DocumentRepository documentRepository;
 
     @Autowired
@@ -34,21 +36,46 @@ public class LocalFileStorageService {
         }
     }
 
-    public void storeFile(MultipartFile file, String userSpecifiedPath, String sanitizedFileName) throws FileStorageException {
+    public void storeFile(MultipartFile file, String pathInsideUserFolder) throws FileStorageException {
         if (file.isEmpty())
             throw new FileStorageException("Failed to store empty file.");
 
-        Path fullPath = validateAndNormalizePath(userSpecifiedPath);
+        Path fullPath = validateAndNormalizePath(pathInsideUserFolder);
 
-        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String originalFilename = LocalFileUtil.extractFileName(pathInsideUserFolder);
         try {
-            Files.createDirectories(fullPath);
-            Path targetLocation = fullPath.resolve(sanitizedFileName);
-            Files.copy(file.getInputStream(), targetLocation);
+            Files.createDirectories(Path.of(LocalFileUtil.extractDirectory(fullPath.toString())));
+            Files.copy(file.getInputStream(), fullPath);
         } catch (IOException ex) {
             if (ex instanceof FileAlreadyExistsException)
                 throw new FileStorageException("File already exists.");
             throw new FileStorageException("Failed to store file " + originalFilename, ex);
+        }
+    }
+
+    public void renameFile(String oldPath, String newPath) throws FileStorageException {
+        Path fullOldPath = validateAndNormalizePath(oldPath);
+        Path fullNewPath = validateAndNormalizePath(newPath).resolve(LocalFileUtil.extractFileName(newPath));
+
+        if (Files.exists(fullNewPath))
+            throw new FileStorageException("there is a file with the same name at destination : " + newPath);
+
+        if (!Files.exists(fullOldPath))
+            throw new FileStorageException("File not found: " + oldPath);
+
+        if (!Files.isRegularFile(fullOldPath))
+            throw new FileStorageException("Not a file: " + oldPath);
+
+        try {
+            Path parent = fullNewPath.getParent();
+            if (parent != null && !Files.exists(parent))
+                Files.createDirectories(parent);
+            Files.move(fullOldPath, fullNewPath, StandardCopyOption.ATOMIC_MOVE);
+
+        } catch (FileAlreadyExistsException e) {
+            throw new FileStorageException("A file with the new name already exists: " + LocalFileUtil.extractFileName(newPath));
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to rename file from " + oldPath + " to " +  LocalFileUtil.extractFileName(newPath), e);
         }
     }
 
@@ -58,7 +85,7 @@ public class LocalFileStorageService {
                 () -> new FileStorageException("Document not found."));
 
         Path fullPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId(), documentEntity.getFilePath());
-        Path validatedPath = validateAndNormalizePath(fullPath.toString());
+        Path validatedPath = validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(),fullPath.toString());
 
 
         try (Stream<Path> pathStream = Files.walk(validatedPath.getParent(), 1)) {
@@ -82,23 +109,19 @@ public class LocalFileStorageService {
         }
     }
 
-    private Path validateAndNormalizePath(String userSpecifiedPath) throws FileStorageException {
-        if (userSpecifiedPath == null || userSpecifiedPath.trim().isEmpty())
-            throw new FileStorageException("User specified path cannot be null or empty");
+    private Path validateAndNormalizePath(UUID userId, String relativePath) {
+        if (relativePath == null || relativePath.trim().isEmpty())
+            throw new IllegalArgumentException("Relative path cannot be null or empty");
 
-        try {
-            Path fullPath = baseStorageLocation.resolve(userSpecifiedPath).normalize().toAbsolutePath();
+        Path userBasePath = baseStorageLocation.resolve(userId.toString());
+        Path inputPath = Path.of(relativePath).normalize();
 
-            if (!fullPath.startsWith(baseStorageLocation))
-                throw new FileStorageException("Access to file outside base storage location is not allowed: " + userSpecifiedPath);
-
-            if (!Files.exists(fullPath.getParent()))
-                throw new FileStorageException("Parent directory does not exist: " + fullPath.getParent());
-
-            return fullPath;
-        } catch (InvalidPathException ex) {
-            throw new FileStorageException("Invalid path: " + userSpecifiedPath, ex);
-        }
+        if (inputPath.startsWith(userBasePath))
+            return inputPath;
+        return userBasePath.resolve(inputPath);
+    }
+    private Path validateAndNormalizePath(String relativePath){
+        return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }
 
 }

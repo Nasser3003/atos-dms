@@ -40,17 +40,17 @@ public abstract class AbstractDocumentService implements IDocumentService {
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
 
-        String sanitizedFileName = sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
-        String relativePath = LocalFileUtil.concatPathToUserIdFolder(userId, extractDirectory(createDto.getFilePath())).toString();
+        String sanitizedFileName = LocalFileUtil.sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
+        String relativePath = LocalFileUtil.concatPathToUserIdFolder(userId, extractFileName(createDto.getFilePath())).toString();
 
         DocumentEntity documentEntity = new DocumentEntity(
-                sanitizedFileName,
+                fileStorageService.baseStorageLocation.resolve(relativePath).toString(),
                 createDto.getType(),
                 createDto.getSizeInBytes(),
                 userId
         );
 
-        fileStorageService.storeFile(createDto.getFile(), relativePath, sanitizedFileName);
+        fileStorageService.storeFile(createDto.getFile(), sanitizedFileName);
         repository.save(documentEntity);
 
         return DocumentMapper.mapToReadDocument(documentEntity);
@@ -61,19 +61,30 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return !document.getCreatedByUserId().equals(userId);
     }
 
+
     DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
 
         DocumentEntity entity = findNoneDeletedDocumentById(documentEditDto.getId());
 
-        entity.setFilePath(documentEditDto.getFilePath());
-        entity.setType(documentEditDto.getType());
-        entity.setTags(documentEditDto.getTags());
-        entity.setPublic(documentEditDto.getIsPublic());
-
         entity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
         entity.setLastAccessed(LocalDateTime.now());
+
+        String oldPath = findNoneDeletedDocumentById(documentEditDto.getId()).getFilePath();
+        if (!oldPath.equals(documentEditDto.getFilePath()))
+            fileStorageService.renameFile(oldPath, documentEditDto.getFilePath());
+
+        if (documentEditDto.getFilePath() != null)
+            entity.setFilePath(fileStorageService.baseStorageLocation
+                    .resolve(CustomJwtAuthenticationConverter.extractUserIdFromContext().toString())
+                    .resolve(documentEditDto.getFilePath()).toString());
+        if (documentEditDto.getType() != null)
+            entity.setType(documentEditDto.getType());
+        if (documentEditDto.getTags() != null)
+            entity.setTags(documentEditDto.getTags());
+        if (documentEditDto.getIsPublic() != null)
+            entity.setPublic(documentEditDto.getIsPublic());
 
         repository.save(entity);
 
@@ -129,10 +140,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Document with id " + id + " not found"));
 
-    }
-
-    private String sanitizeFileName(String fileName) {
-        return fileName.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
 
 }

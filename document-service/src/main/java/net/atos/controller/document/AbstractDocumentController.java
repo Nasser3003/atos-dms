@@ -22,7 +22,7 @@ public abstract class AbstractDocumentController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DocumentReadOnlyDto> createDocument(
             @RequestPart("file") MultipartFile file,
-            @RequestPart(value = "type", required = false) String type,
+            @RequestPart(value = "type") String type,
             @RequestPart(value = "filePath", required = false) String filePath) {
 
         DocumentCreateDto documentCreateDto = new DocumentCreateDto(

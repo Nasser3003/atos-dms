@@ -150,6 +150,10 @@ public class DocumentEntity {
         return attributes.containsKey(key);
     }
 
+    public void setType(EnumDataType type) {
+        initializeAttributes(type);
+    }
+
     public String getAttribute(String key) {
         if (key == null || key.isEmpty())
             throw new IllegalArgumentException("Attribute key cannot be null or empty");
