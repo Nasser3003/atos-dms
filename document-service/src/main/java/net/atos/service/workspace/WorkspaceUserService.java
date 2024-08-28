@@ -87,16 +87,13 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     }
 
     @Override
+    @Transactional
     public WorkspaceReadDto updateWorkspace(WorkspaceEditDto workspaceEditDto) {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceEditDto.getId());
-        if (workspaceEntity.getCreatedByUserId().equals(authenticatedUserId))
-            throw new UnauthorizedException("you dont have permissions to update this workspace");
+        if (NotWorkspaceOwner(workspaceEntity))
+            throw new UnauthorizedException("You are not authorized to update this workspace");
 
-        // use update helper and persist the changes
-        // TODO
-        return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
+        return WorkspaceMapper.mapToReadWorkspace(updateWorkspaceHelper(workspaceEditDto));
     }
 
     @Override

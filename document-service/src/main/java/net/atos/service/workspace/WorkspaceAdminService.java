@@ -62,8 +62,9 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     }
 
     @Override
+    @Transactional
     public WorkspaceReadDto updateWorkspace(WorkspaceEditDto workspaceEditDto) {
-        return null;
+        return WorkspaceMapper.mapToReadWorkspace(updateWorkspaceHelper(workspaceEditDto));
     }
 
     @Override

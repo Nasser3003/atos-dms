@@ -3,6 +3,7 @@ package net.atos.service.workspace;
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.workspace.WorkspaceCreateDto;
+import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.exception.NotFoundException;
 import net.atos.mapper.WorkspaceMapper;
@@ -38,6 +39,18 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
         WorkspaceEntity workspaceEntity = findWorkspaceById(id);
         if (workspaceEntity.isDeleted())
             throw new NotFoundException("Workspace doesnt exist or is deleted");
+        return workspaceEntity;
+    }
+
+    WorkspaceEntity updateWorkspaceHelper(WorkspaceEditDto workspaceEditDto) {
+        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceEditDto.getId());
+
+        if (workspaceEditDto.getName() != null && !workspaceEditDto.getName().isBlank())
+            workspaceEntity.setName(workspaceEditDto.getName().trim());
+        if (workspaceEditDto.getDescription() != null && !workspaceEditDto.getDescription().isBlank())
+            workspaceEntity.setDescription(workspaceEditDto.getDescription().trim());
+
+        repository.save(workspaceEntity);
         return workspaceEntity;
     }
 

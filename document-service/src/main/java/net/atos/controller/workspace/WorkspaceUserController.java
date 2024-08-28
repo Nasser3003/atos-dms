@@ -34,9 +34,7 @@ public class WorkspaceUserController extends AbstractWorkspaceController {
     @Override
     @PutMapping("/update")
     public ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto) {
-        workspaceService.updateWorkspace(workspaceEditDto);
-        // TODO
-        return null;
+        return ResponseEntity.ok(workspaceService.updateWorkspace(workspaceEditDto));
     }
 
     @Override
