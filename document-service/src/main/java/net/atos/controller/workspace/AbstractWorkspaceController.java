@@ -20,23 +20,15 @@ public abstract class AbstractWorkspaceController {
     final IWorkspaceService workspaceService;
 
     @PostMapping("/create")
-    public ResponseEntity<WorkspaceReadDto> createWorkspace(WorkspaceCreateDto workspaceCreateDto) {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-
-        WorkspaceEntity workspaceEntity = new WorkspaceEntity(workspaceCreateDto.getName(),
-                workspaceCreateDto.getDescription(), authenticatedUserId);
-        return ResponseEntity.ok(WorkspaceMapper.mapToReadWorkspace(workspaceEntity));
+    public ResponseEntity<WorkspaceReadDto> createWorkspace(@RequestBody WorkspaceCreateDto workspaceCreateDto) {
+        return ResponseEntity.ok(workspaceService.createWorkspace(workspaceCreateDto));
     }
 
-    @GetMapping("/workspace/{id}")
     public abstract ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id);
 
-    @GetMapping("/workspace/all")
     public abstract ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace();
 
-    @PutMapping("/update")
     public abstract ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto);
 
-    @DeleteMapping("/delete/{id}")
     public abstract ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id);
 }

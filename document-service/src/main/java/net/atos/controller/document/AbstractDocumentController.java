@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -34,15 +35,14 @@ public abstract class AbstractDocumentController {
         return ResponseEntity.ok(documentService.createDocument(documentCreateDto));
     }
 
-    @GetMapping("/document/{id}")
+
+    public abstract ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments();
+
     public abstract ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id);
 
-    @PutMapping("/update")
     public abstract ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto);
 
-    @DeleteMapping("/delete/{id}")
     public abstract ResponseEntity<Void> deleteDocument(@PathVariable UUID id);
 
-    @PostMapping("/{id}")
     public abstract ResponseEntity<Resource> downloadDocument(@PathVariable UUID id);
 }

@@ -5,8 +5,7 @@ import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.service.workspace.WorkspaceUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,24 +20,28 @@ public class WorkspaceUserController extends AbstractWorkspaceController {
     }
 
     @Override
-    public ResponseEntity<WorkspaceReadDto> getWorkspace(UUID id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id) {
         return ResponseEntity.ok(workspaceService.getWorkspace(id));
     }
 
     @Override
+    @GetMapping("/all")
     public ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace() {
         return ResponseEntity.ok(workspaceService.getAllWorkspaces());
     }
 
     @Override
-    public ResponseEntity<WorkspaceReadDto> updateWorkspace(WorkspaceEditDto workspaceEditDto) {
+    @PutMapping("/update")
+    public ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto) {
         workspaceService.updateWorkspace(workspaceEditDto);
         // TODO
         return null;
     }
 
     @Override
-    public ResponseEntity<Void> deleteWorkspace(UUID id) {
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id) {
         workspaceService.deleteWorkspace(id);
         return ResponseEntity.noContent().build();    }
 }

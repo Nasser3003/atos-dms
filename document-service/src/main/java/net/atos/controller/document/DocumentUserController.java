@@ -20,26 +20,31 @@ public class DocumentUserController extends AbstractDocumentController {
         super(documentService);
     }
 
+    @Override
     @PostMapping("/{id}")
     public ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
         return documentService.downloadDocument(id);
     }
 
+    @Override
     @GetMapping("/all")
     public ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
         return ResponseEntity.ok(documentService.getAllDocuments());
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.getDocument(id));
     }
 
+    @Override
     @PutMapping("/update")
     public ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto) {
         return ResponseEntity.ok(documentService.updateDocument(documentEditDto));
     }
 
+    @Override
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
         documentService.deleteDocument(id);
