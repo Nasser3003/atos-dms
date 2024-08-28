@@ -3,6 +3,7 @@ package net.atos.controller.workspace;
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.workspace.WorkspaceCreateDto;
+import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.mapper.WorkspaceMapper;
@@ -31,4 +32,8 @@ public abstract class AbstractWorkspaceController {
     public abstract ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto);
 
     public abstract ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id);
+
+    public abstract ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+
+    public abstract ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
 }

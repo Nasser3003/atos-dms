@@ -1,10 +1,9 @@
 package net.atos.service.workspace;
 
+import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
-import net.atos.exception.NotFoundException;
 import net.atos.mapper.WorkspaceMapper;
-import net.atos.model.DocumentEntity;
 import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
 import net.atos.repository.WorkspaceRepository;
@@ -24,28 +23,6 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     @Autowired
     public WorkspaceAdminService(WorkspaceRepository repository, DocumentRepository documentRepository) {
         super(repository, documentRepository);
-    }
-
-    @Override
-    @Transactional
-    public WorkspaceReadDto addDocument(UUID documentId, UUID workspaceId) {
-        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceId);
-        DocumentEntity documentEntity = documentRepository.findById(documentId)
-                .orElseThrow(() -> new NotFoundException("Document with ID " + documentId + " not found"));
-
-        workspaceEntity.addDocument(documentEntity);
-        return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
-    }
-
-    @Override
-    @Transactional
-    public WorkspaceReadDto removeDocument(UUID documentId, UUID workspaceId) {
-        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceId);
-        DocumentEntity documentEntity = documentRepository.findById(documentId)
-                .orElseThrow(() -> new NotFoundException("Document with ID " + documentId + " not found"));
-
-        workspaceEntity.removeDocument(documentEntity);
-        return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
     }
 
     @Override
@@ -78,4 +55,15 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     public ResponseEntity<Resource> downloadDocument(UUID id) {
         return null;
     }
+
+    @Override
+    public WorkspaceReadDto addDocument(WorkspaceDocumentDto addDocument) {
+        return WorkspaceMapper.mapToReadWorkspace(addDocumentHelper(addDocument));
+    }
+
+    @Override
+    public WorkspaceReadDto removeDocument(WorkspaceDocumentDto removeDocument) {
+        return WorkspaceMapper.mapToReadWorkspace(removeDocumentHelper(removeDocument));
+    }
+
 }

@@ -2,11 +2,14 @@ package net.atos.service.workspace;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
+import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceCreateDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.exception.FileStorageException;
 import net.atos.exception.NotFoundException;
 import net.atos.mapper.WorkspaceMapper;
+import net.atos.model.DocumentEntity;
 import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
 import net.atos.repository.WorkspaceRepository;
@@ -30,7 +33,7 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
         return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
      }
 
-    boolean NotWorkspaceOwner(WorkspaceEntity workspaceEntity) {
+    boolean notWorkspaceOwner(WorkspaceEntity workspaceEntity) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         return !workspaceEntity.getCreatedByUserId().equals(userId);
     }
@@ -50,6 +53,28 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
         if (workspaceEditDto.getDescription() != null && !workspaceEditDto.getDescription().isBlank())
             workspaceEntity.setDescription(workspaceEditDto.getDescription().trim());
 
+        repository.save(workspaceEntity);
+        return workspaceEntity;
+    }
+
+    WorkspaceEntity addDocumentHelper(WorkspaceDocumentDto workspaceDocumentDto) {
+        WorkspaceEntity  workspaceEntity= findNoneDeletedWorkspace(workspaceDocumentDto.getWorkspaceId());
+        DocumentEntity documentEntity = documentRepository.findById(workspaceDocumentDto.getDocumentId())
+                .orElseThrow(() -> new FileStorageException("document not found"));
+        if (documentEntity.isDeleted())
+            throw new NotFoundException("Document doesnt exist or is deleted");
+
+        workspaceEntity.addDocument(documentEntity);
+        repository.save(workspaceEntity);
+        return workspaceEntity;
+    }
+
+    WorkspaceEntity removeDocumentHelper(WorkspaceDocumentDto workspaceDocumentDto) {
+        WorkspaceEntity  workspaceEntity= findNoneDeletedWorkspace(workspaceDocumentDto.getWorkspaceId());
+        DocumentEntity documentEntity = documentRepository.findById(workspaceDocumentDto.getDocumentId())
+                .orElseThrow(() -> new FileStorageException("document not found"));
+
+        workspaceEntity.removeDocument(documentEntity);
         repository.save(workspaceEntity);
         return workspaceEntity;
     }

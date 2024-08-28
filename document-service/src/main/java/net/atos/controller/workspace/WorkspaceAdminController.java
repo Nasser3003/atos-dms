@@ -1,5 +1,6 @@
 package net.atos.controller.workspace;
 
+import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.service.workspace.WorkspaceAdminService;
@@ -44,5 +45,17 @@ public class WorkspaceAdminController extends AbstractWorkspaceController{
     public ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id) {
         workspaceService.deleteWorkspace(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PutMapping("/add/doc")
+    public ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+        return ResponseEntity.ok(workspaceService.addDocument(workspaceDocumentDto));
+    }
+
+    @Override
+    @PutMapping("/rm/doc")
+    public ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+        return ResponseEntity.ok(workspaceService.removeDocument(workspaceDocumentDto));
     }
 }
