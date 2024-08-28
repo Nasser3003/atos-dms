@@ -5,6 +5,7 @@ import net.atos.dto.AuthDto;
 import net.atos.dto.LoginResponseDTO;
 import net.atos.model.UserEntity;
 import net.atos.repository.UserRepository;
+import net.atos.util.Util;
 import net.atos.validation.AuthValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ public class UserAuthService {
     private final AuthValidator authValidator;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticateManager;
+    private final Util util;
 
     public void registerUser(AuthDto authDTO) {
         authValidator.validateRegistration(authDTO);
@@ -37,15 +39,11 @@ public class UserAuthService {
                         .getEmail(),authDto.getPassword())
         );
 
-        String token = jwtTokenService.generateJWT(auth, findUserByEmail(authDto.getEmail()).getId());
-        UserEntity user = findUserByEmail(authDto.getEmail());
+        String token = jwtTokenService.generateJWT(auth, util.findUserByEmail(authDto.getEmail()).getId());
+        UserEntity user = util.findUserByEmail(authDto.getEmail());
 
         return new LoginResponseDTO(user.getId(), user.getEmail(), token);
     }
 
 
-    public UserEntity findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
 }

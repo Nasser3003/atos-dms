@@ -2,10 +2,7 @@ package net.atos.service.workspace;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
-import net.atos.dto.workspace.WorkspaceDocumentDto;
-import net.atos.dto.workspace.WorkspaceCreateDto;
-import net.atos.dto.workspace.WorkspaceEditDto;
-import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.dto.workspace.*;
 import net.atos.exception.FileStorageException;
 import net.atos.exception.NotFoundException;
 import net.atos.mapper.WorkspaceMapper;
@@ -85,4 +82,30 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
 
     }
 
+    WorkspaceEntity addUserHelper(WorkspaceUserDto workspaceUserDto) {
+        if (workspaceUserDto.getUserId() == null)
+            throw new IllegalArgumentException("user not found");
+        if (workspaceUserDto.getWorkspaceId() == null)
+            throw new IllegalArgumentException("workspace not found");
+
+        UUID userId = workspaceUserDto.getUserId();
+        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId());
+        workspaceEntity.addUser(userId);
+        repository.save(workspaceEntity);
+        return workspaceEntity;
+    }
+
+    WorkspaceEntity removeUserHelper(WorkspaceUserDto workspaceUserDto) {
+        if (workspaceUserDto.getUserId() == null)
+            throw new IllegalArgumentException("user not found");
+        if (workspaceUserDto.getWorkspaceId() == null)
+            throw new IllegalArgumentException("workspace not found");
+
+
+        UUID userId = workspaceUserDto.getUserId();
+        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId());
+        workspaceEntity.removeUser(userId);
+        repository.save(workspaceEntity);
+        return workspaceEntity;
+    }
 }

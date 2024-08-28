@@ -2,8 +2,8 @@ package net.atos.validation;
 
 import lombok.RequiredArgsConstructor;
 import net.atos.dto.AuthDto;
-import net.atos.repository.UserRepository;
 import net.atos.exception.*;
+import net.atos.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

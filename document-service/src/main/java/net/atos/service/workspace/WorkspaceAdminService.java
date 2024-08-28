@@ -3,6 +3,7 @@ package net.atos.service.workspace;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.dto.workspace.WorkspaceUserDto;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
@@ -54,6 +55,16 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     @Override
     public ResponseEntity<Resource> downloadDocument(UUID id) {
         return null;
+    }
+
+    @Override
+    public WorkspaceReadDto addUser(WorkspaceUserDto workspaceUserDto) {
+        return WorkspaceMapper.mapToReadWorkspace(addUserHelper(workspaceUserDto));
+    }
+
+    @Override
+    public WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto) {
+        return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
     }
 
     @Override

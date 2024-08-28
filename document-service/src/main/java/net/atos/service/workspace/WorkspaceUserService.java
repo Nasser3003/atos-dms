@@ -4,6 +4,7 @@ import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
+import net.atos.dto.workspace.WorkspaceUserDto;
 import net.atos.exception.UnauthorizedException;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
@@ -73,6 +74,26 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
         return null;
     }
 
+    @Override
+    public WorkspaceReadDto addUser(WorkspaceUserDto workspaceUserDto) {
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
+            throw new UnauthorizedException("you dont have permissions to add this User");
+        if (!findNoneDeletedWorkspace(workspaceUserDto.getUserId()).getCreatedByUserId().equals(authenticatedUserId))
+            throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
+        return WorkspaceMapper.mapToReadWorkspace(addUserHelper(workspaceUserDto));
+    }
+
+    @Override
+    public WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto) {
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
+            throw new UnauthorizedException("you dont have permissions to add this User");
+        if (!findNoneDeletedWorkspace(workspaceUserDto.getUserId()).getCreatedByUserId().equals(authenticatedUserId))
+            throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
+        return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
+    }
+    
     @Override
     public WorkspaceReadDto addDocument(WorkspaceDocumentDto addDocumentWorkspace) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(addDocumentWorkspace.getWorkspaceId());
