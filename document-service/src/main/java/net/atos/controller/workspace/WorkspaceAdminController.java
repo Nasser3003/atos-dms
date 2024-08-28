@@ -24,38 +24,50 @@ public class WorkspaceAdminController extends AbstractWorkspaceController{
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id) {
+    ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id) {
         return ResponseEntity.ok(workspaceService.getWorkspace(id));
     }
 
     @Override
     @GetMapping("/all")
-    public ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace() {
+    ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace() {
        return ResponseEntity.ok(workspaceService.getAllWorkspaces());
     }
 
     @Override
     @PutMapping("/update")
-    public ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto) {
+    ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto) {
         return ResponseEntity.ok(workspaceService.updateWorkspace(workspaceEditDto));
     }
 
     @Override
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id) {
+    ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id) {
         workspaceService.deleteWorkspace(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @PutMapping("/add/doc")
-    public ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+    ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
         return ResponseEntity.ok(workspaceService.addDocument(workspaceDocumentDto));
     }
 
     @Override
     @PutMapping("/rm/doc")
-    public ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+    ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+        return ResponseEntity.ok(workspaceService.removeDocument(workspaceDocumentDto));
+    }
+
+    @Override
+    @PutMapping("/add/user")
+    ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
+        return ResponseEntity.ok(workspaceService.addDocument(workspaceDocumentDto));
+    }
+
+    @Override
+    @PutMapping("/rm/user")
+    ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto) {
         return ResponseEntity.ok(workspaceService.removeDocument(workspaceDocumentDto));
     }
 }

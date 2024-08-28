@@ -9,7 +9,10 @@ import net.atos.service.document.IDocumentService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,7 +24,7 @@ public abstract class AbstractDocumentController {
     final IDocumentService documentService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DocumentReadOnlyDto> createDocument(
+    ResponseEntity<DocumentReadOnlyDto> createDocument(
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "type") String type,
             @RequestPart(value = "filePath", required = false) String filePath) {
@@ -36,13 +39,13 @@ public abstract class AbstractDocumentController {
     }
 
 
-    public abstract ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments();
+    abstract ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments();
 
-    public abstract ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id);
+    abstract ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id);
 
-    public abstract ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto);
+    abstract ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto);
 
-    public abstract ResponseEntity<Void> deleteDocument(@PathVariable UUID id);
+    abstract ResponseEntity<Void> deleteDocument(@PathVariable UUID id);
 
-    public abstract ResponseEntity<Resource> downloadDocument(@PathVariable UUID id);
+    abstract ResponseEntity<Resource> downloadDocument(@PathVariable UUID id);
 }

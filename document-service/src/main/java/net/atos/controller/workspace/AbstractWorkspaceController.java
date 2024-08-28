@@ -1,16 +1,15 @@
 package net.atos.controller.workspace;
 
 import lombok.RequiredArgsConstructor;
-import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.workspace.WorkspaceCreateDto;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
-import net.atos.mapper.WorkspaceMapper;
-import net.atos.model.WorkspaceEntity;
 import net.atos.service.workspace.IWorkspaceService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,15 +24,20 @@ public abstract class AbstractWorkspaceController {
         return ResponseEntity.ok(workspaceService.createWorkspace(workspaceCreateDto));
     }
 
-    public abstract ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id);
+    abstract ResponseEntity<WorkspaceReadDto> getWorkspace(@PathVariable UUID id);
 
-    public abstract ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace();
+    abstract ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace();
 
-    public abstract ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto);
+    abstract ResponseEntity<WorkspaceReadDto> updateWorkspace(@RequestBody WorkspaceEditDto workspaceEditDto);
 
-    public abstract ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id);
+    abstract ResponseEntity<Void> deleteWorkspace(@PathVariable UUID id);
 
-    public abstract ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+    abstract ResponseEntity<WorkspaceReadDto> addDocumentToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
 
-    public abstract ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+    abstract ResponseEntity<WorkspaceReadDto> removeDocumentFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+
+    abstract ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+
+    abstract ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceDocumentDto workspaceDocumentDto);
+
 }

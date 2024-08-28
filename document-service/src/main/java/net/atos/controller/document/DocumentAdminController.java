@@ -18,38 +18,38 @@ import java.util.UUID;
 public class DocumentAdminController extends AbstractDocumentController {
 
     @Autowired
-    public DocumentAdminController(DocumentAdminService documentService) {
+    DocumentAdminController(DocumentAdminService documentService) {
         super(documentService);
     }
 
     @Override
     @GetMapping("/all")
-    public ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
+    ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
         return ResponseEntity.ok(documentService.getAllDocuments());
     }
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
+    ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.getDocument(id));
     }
 
     @Override
     @PutMapping("/update")
-    public ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto) {
+    ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto) {
         return ResponseEntity.ok(documentService.updateDocument(documentEditDto));
     }
 
     @Override
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
+    ResponseEntity<Void> deleteDocument(@PathVariable UUID id) {
         documentService.deleteDocument(id);
         return ResponseEntity.noContent().build();
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<Resource> downloadDocument(UUID id) {
+    ResponseEntity<Resource> downloadDocument(UUID id) {
         return null;
     }
 }
