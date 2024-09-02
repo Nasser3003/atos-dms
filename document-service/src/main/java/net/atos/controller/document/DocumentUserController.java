@@ -21,7 +21,7 @@ public class DocumentUserController extends AbstractDocumentController {
     }
 
     @Override
-    @PostMapping("/{id}")
+    @PostMapping("/download/{id}")
     ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
         return documentService.downloadDocument(id);
     }

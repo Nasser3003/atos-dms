@@ -3,6 +3,7 @@ package net.atos.service.document;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.exception.FileDownloadException;
 import net.atos.exception.UnauthorizedException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
@@ -22,9 +23,12 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentUserService extends AbstractDocumentService {
 
+    private final LocalFileStorageService localFileStorageService;
+
     @Autowired
     public DocumentUserService(DocumentRepository repository, LocalFileStorageService localFileStorageService) {
         super(repository, localFileStorageService);
+        this.localFileStorageService = localFileStorageService;
     }
 
     @Override
@@ -91,12 +95,11 @@ public class DocumentUserService extends AbstractDocumentService {
     public ResponseEntity<Resource> downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         if (!documentEntity.isUserAuthorized(id))
-            throw new UnauthorizedException("You don't have the privileges to download Document with id " + id);
-
+            throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         try {
-            return downloadDocumentHelper(documentEntity);
+            return downloadFileHelper(id);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileDownloadException("Error downloading file: ", e);
         }
     }
 }

@@ -48,8 +48,8 @@ public class DocumentAdminController extends AbstractDocumentController {
     }
 
     @Override
-    @PostMapping
-    ResponseEntity<Resource> downloadDocument(UUID id) {
-        return null;
+    @PostMapping("/download/{id}")
+    ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
+        return documentService.downloadDocument(id);
     }
 }

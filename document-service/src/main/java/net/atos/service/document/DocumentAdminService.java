@@ -2,6 +2,7 @@ package net.atos.service.document;
 
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.exception.FileDownloadException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -71,12 +72,10 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     @Override
     public ResponseEntity<Resource> downloadDocument(UUID id) {
-        DocumentEntity document = findNoneDeletedDocumentById(id);
-
         try {
-            return downloadDocumentHelper(document);
+            return downloadFileHelper(id);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileDownloadException("Error downloading file: ", e);
         }
     }
 

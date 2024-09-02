@@ -1,5 +1,6 @@
 package net.atos.service;
 
+import lombok.Getter;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.exception.FileStorageException;
 import net.atos.model.DocumentEntity;
@@ -10,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -119,9 +120,53 @@ public class LocalFileStorageService {
         return concatPathToUserIdFolder(userBasePath.toString(), normalizedPath.toString());
     }
 
+    public MultipartFile getMultipartFile(Path filePath) throws IOException {
+        return new CustomMultipartFile(filePath);
+    }
+
+    @Getter
+    public static class CustomMultipartFile implements MultipartFile {
+
+        private final Path filePath;
+        private final String name;
+        private final String originalFilename;
+        private final String contentType;
+        private final byte[] bytes;
+
+        public CustomMultipartFile(Path filePath) throws IOException {
+            this.filePath = filePath;
+            this.name = filePath.getFileName().toString();
+            this.originalFilename = this.name;
+            this.contentType = Files.probeContentType(filePath);
+            this.bytes = Files.readAllBytes(filePath);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return bytes.length == 0;
+        }
+
+        @Override
+        public long getSize() {
+            return bytes.length;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(bytes);
+        }
+
+        @Override
+        public void transferTo(File dest) throws IOException, IllegalStateException {
+            try (OutputStream os = new FileOutputStream(dest)) {
+                os.write(bytes);
+            }
+        }
+    }
 
     private Path validateAndNormalizePath(String relativePath){
         return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }
 
 }
+

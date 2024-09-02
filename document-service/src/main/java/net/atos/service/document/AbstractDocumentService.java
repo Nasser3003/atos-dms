@@ -12,8 +12,8 @@ import net.atos.repository.DocumentRepository;
 import net.atos.service.LocalFileStorageService;
 import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +59,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return !document.getCreatedByUserId().equals(userId);
     }
 
-
     DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
         if (documentEditDto == null)
             throw new IllegalArgumentException("Entity cannot be null");
@@ -90,32 +89,30 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return DocumentMapper.mapToReadDocument(entity);
     }
 
-    ResponseEntity<Resource> downloadDocumentHelper(DocumentEntity document) throws IOException {
-
-        Path filePath = fileStorageService.getFilePathById(document.getId());
-
-        Resource resource = new UrlResource(filePath.toUri());
-
-        if (resource.exists() || resource.isReadable()) {
-            String contentType = Files.probeContentType(filePath);
-            if (contentType == null)
-                contentType = "application/octet-stream";
-
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
-        }
-        else
-            throw new NotFoundException("Could not read file: " + document.getFilePath());
-    }
-
     DocumentEntity findNoneDeletedDocumentById(UUID id) {
         DocumentEntity documentEntity = findDocumentById(id);
         if (documentEntity.isDeleted())
             throw new NotFoundException("file doesnt exist or is deleted");
         return documentEntity;
+    }
+
+    public ResponseEntity<Resource> downloadFileHelper(UUID documentId) throws IOException {
+        Path filePath = fileStorageService.getFilePathById(documentId);
+
+        if (!Files.exists(filePath) || !Files.isReadable(filePath))
+            throw new NotFoundException("File not found or not readable: " + filePath);
+
+        String fileName = filePath.getFileName().toString();
+        String contentType = Files.probeContentType(filePath);
+        contentType = (contentType != null) ? contentType : "application/octet-stream";
+
+        Resource resource = new InputStreamResource(Files.newInputStream(filePath));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(MediaType.parseMediaType(contentType))
+                .contentLength(Files.size(filePath))
+                .body(resource);
     }
 
     private DocumentEntity findDocumentById(UUID id) {
