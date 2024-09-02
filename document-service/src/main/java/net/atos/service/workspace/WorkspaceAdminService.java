@@ -1,9 +1,11 @@
 package net.atos.service.workspace;
 
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.dto.workspace.WorkspaceUserDto;
+import net.atos.mapper.DocumentMapper;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
@@ -65,6 +67,12 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     @Override
     public WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto) {
         return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
+    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId) {
+        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceId);
+        return workspaceEntity.getDocuments().stream().map(DocumentMapper::mapToReadDocument).collect(Collectors.toList());
     }
 
     @Override

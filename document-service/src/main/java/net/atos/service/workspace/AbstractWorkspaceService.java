@@ -13,6 +13,7 @@ import net.atos.repository.WorkspaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -33,6 +34,11 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
     boolean notWorkspaceOwner(WorkspaceEntity workspaceEntity) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         return !workspaceEntity.getCreatedByUserId().equals(userId);
+    }
+
+    boolean notWorkspaceMember(WorkspaceEntity workspaceEntity) {
+        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        return !workspaceEntity.getAccessibleByUsers().contains(userId);
     }
 
     WorkspaceEntity findNoneDeletedWorkspace(UUID id) {
@@ -110,4 +116,5 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
         repository.save(workspaceEntity);
         return workspaceEntity;
     }
+
 }

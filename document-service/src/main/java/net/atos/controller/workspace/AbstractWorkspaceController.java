@@ -1,6 +1,7 @@
 package net.atos.controller.workspace;
 
 import lombok.RequiredArgsConstructor;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.*;
 import net.atos.service.workspace.IWorkspaceService;
 import org.springframework.http.ResponseEntity;
@@ -36,5 +37,8 @@ public abstract class AbstractWorkspaceController {
     abstract ResponseEntity<WorkspaceReadDto> addUserToWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto);
 
     abstract ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto);
+
+    abstract ResponseEntity<List<DocumentReadOnlyDto>> showWorkspaceDocuments(@PathVariable UUID userId);
+
 
 }

@@ -1,6 +1,8 @@
 package net.atos.service.workspace;
 
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.*;
+import net.atos.model.DocumentEntity;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
@@ -28,6 +30,9 @@ public interface IWorkspaceService {
     WorkspaceReadDto addUser(WorkspaceUserDto workspaceUserDto);
 
     WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto);
+
+    List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId);
+
 }
 
 

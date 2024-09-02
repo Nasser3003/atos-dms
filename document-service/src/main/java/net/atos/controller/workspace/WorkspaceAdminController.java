@@ -1,5 +1,6 @@
 package net.atos.controller.workspace;
 
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
@@ -70,5 +71,11 @@ public class WorkspaceAdminController extends AbstractWorkspaceController{
     @PutMapping("/rm/user")
     ResponseEntity<WorkspaceReadDto> removeUserFromWorkspace(@RequestBody WorkspaceUserDto workspaceUserDto) {
         return ResponseEntity.ok(workspaceService.removeUser(workspaceUserDto));
+    }
+
+    @Override
+    @GetMapping("/docs/{workspaceId}")
+    ResponseEntity<List<DocumentReadOnlyDto>> showWorkspaceDocuments(@PathVariable UUID workspaceId) {
+        return ResponseEntity.ok(workspaceService.getAllDocumentsByWorkspaceId(workspaceId));
     }
 }

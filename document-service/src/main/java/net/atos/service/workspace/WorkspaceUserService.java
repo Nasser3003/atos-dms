@@ -1,11 +1,13 @@
 package net.atos.service.workspace;
 
 import net.atos.configuration.CustomJwtAuthenticationConverter;
+import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
 import net.atos.dto.workspace.WorkspaceReadDto;
 import net.atos.dto.workspace.WorkspaceUserDto;
 import net.atos.exception.UnauthorizedException;
+import net.atos.mapper.DocumentMapper;
 import net.atos.mapper.WorkspaceMapper;
 import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
@@ -93,7 +95,15 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
             throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
         return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
     }
-    
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId) {
+        WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceId);
+        if (notWorkspaceMember(workspaceEntity))
+            throw new UnauthorizedException("you arent a member of this workspace");
+        return workspaceEntity.getDocuments().stream().map(DocumentMapper::mapToReadDocument).collect(Collectors.toList());
+    }
+
     @Override
     public WorkspaceReadDto addDocument(WorkspaceDocumentDto addDocumentWorkspace) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(addDocumentWorkspace.getWorkspaceId());
