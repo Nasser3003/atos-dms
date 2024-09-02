@@ -21,8 +21,6 @@
     <modules>
         <module>auth-user-service</module>
         <module>document-service</module>
-        <module>search-service</module>
-        <module>analyzing-document-service</module>
     </modules>
 
     <!-- Manages global dependencies, inherits from properties -->

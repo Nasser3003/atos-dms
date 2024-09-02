@@ -13,8 +13,6 @@ import net.atos.model.WorkspaceEntity;
 import net.atos.repository.DocumentRepository;
 import net.atos.repository.WorkspaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,14 +48,6 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getNoneDeletedWorkspaces() {
-        return repository.findAll().stream()
-                .filter(w -> !w.isDeleted())
-                .map(WorkspaceMapper::mapToReadWorkspace)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public WorkspaceReadDto getWorkspace(UUID id) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(id);
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
@@ -86,11 +76,6 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
             throw new UnauthorizedException("you dont have permissions to delete this workspace");
         workspaceEntity.setDeleted(true);
         repository.save(workspaceEntity);
-    }
-
-    @Override
-    public ResponseEntity<Resource> downloadDocument(UUID id) {
-        return null;
     }
 
     @Override
