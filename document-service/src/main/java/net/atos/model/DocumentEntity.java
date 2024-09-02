@@ -30,6 +30,8 @@ public class DocumentEntity {
         this.createdByUserId = createdByUserId;
         this.lastModifiedByUserId = createdByUserId;
         initializeAttributes(type);
+        this.accessibleByUsers = new HashSet<>();
+        accessibleByUsers.add(createdByUserId);
     }
 
     @Id
@@ -78,7 +80,7 @@ public class DocumentEntity {
     @NotNull
     @Field("accessible_by_users")
     @Setter(AccessLevel.NONE)
-    private Set<UUID> accessibleByUsers = new HashSet<>();
+    private Set<UUID> accessibleByUsers;
 
     @NotNull
     @Field("last_modified_by_user_id")
@@ -191,6 +193,9 @@ public class DocumentEntity {
 
         if (!accessibleByUsers.contains(id))
             throw new IllegalArgumentException("User does not have access: " + id);
+
+        if (id.equals(createdByUserId))
+            throw new IllegalArgumentException("cannot remove the owner: " + id);
 
         accessibleByUsers.remove(id);
         return this;

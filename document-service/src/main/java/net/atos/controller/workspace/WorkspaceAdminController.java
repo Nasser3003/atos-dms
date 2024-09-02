@@ -32,7 +32,7 @@ public class WorkspaceAdminController extends AbstractWorkspaceController{
 
     @Override
     @GetMapping("/all")
-    ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace() {
+    ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace()    {
        return ResponseEntity.ok(workspaceService.getAllWorkspaces());
     }
 

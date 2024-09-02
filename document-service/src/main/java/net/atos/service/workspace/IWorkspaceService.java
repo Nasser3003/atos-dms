@@ -16,9 +16,11 @@ public interface IWorkspaceService {
 
     WorkspaceReadDto removeDocument(WorkspaceDocumentDto workspaceDocumentDto);
 
+    List<WorkspaceReadDto> getAllWorkspacesForUser();
+
     List<WorkspaceReadDto> getAllWorkspaces();
 
-    List<WorkspaceReadDto> getAllWorkspaces(UUID userId);
+    List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId);
 
     List<WorkspaceReadDto> getNoneDeletedWorkspaces();
 

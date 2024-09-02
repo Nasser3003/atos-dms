@@ -31,7 +31,7 @@ public class WorkspaceUserController extends AbstractWorkspaceController {
     @Override
     @GetMapping("/all")
     ResponseEntity<List<WorkspaceReadDto>> getAllWorkspace() {
-        return ResponseEntity.ok(workspaceService.getAllWorkspaces());
+        return ResponseEntity.ok(workspaceService.getAllWorkspacesForUser());
     }
 
     @Override

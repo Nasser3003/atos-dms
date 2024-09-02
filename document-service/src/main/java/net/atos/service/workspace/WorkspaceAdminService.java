@@ -30,13 +30,20 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspaces() {
+    public List<WorkspaceReadDto> getAllWorkspacesForUser() {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return getAllWorkspaces(authenticatedUserId);
+        return getAllWorkspacesForUser(authenticatedUserId);
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspaces(UUID userId) {
+    public List<WorkspaceReadDto> getAllWorkspaces() {
+        return repository.findAll().stream()
+                .map(WorkspaceMapper::mapToReadWorkspace)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId) {
         return repository.findAll().stream()
                 .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
                 .map(WorkspaceMapper::mapToReadWorkspace)

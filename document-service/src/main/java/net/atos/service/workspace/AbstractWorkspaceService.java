@@ -40,8 +40,8 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
         return !workspaceEntity.getAccessibleByUsers().contains(userId);
     }
 
-    WorkspaceEntity findNoneDeletedWorkspace(UUID id) {
-        WorkspaceEntity workspaceEntity = findWorkspaceById(id);
+    WorkspaceEntity findNoneDeletedWorkspace(UUID workspaceId) {
+        WorkspaceEntity workspaceEntity = findWorkspaceById(workspaceId);
         if (workspaceEntity.isDeleted())
             throw new NotFoundException("Workspace doesnt exist or is deleted");
         return workspaceEntity;

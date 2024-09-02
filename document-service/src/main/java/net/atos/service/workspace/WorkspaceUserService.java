@@ -31,13 +31,18 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspaces() {
+    public List<WorkspaceReadDto> getAllWorkspacesForUser() {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return getAllWorkspaces(authenticatedUserId);
+        return getAllWorkspacesForUser(authenticatedUserId);
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspaces(UUID userId) {
+    public List<WorkspaceReadDto> getAllWorkspaces() {
+        throw new UnsupportedOperationException("This operation is not supported for this user type");
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId) {
         return repository.findAll().stream()
                 .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
                 .map(WorkspaceMapper::mapToReadWorkspace)
@@ -93,7 +98,8 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
             throw new UnauthorizedException("you dont have permissions to add this User");
-        if (!findNoneDeletedWorkspace(workspaceUserDto.getUserId()).getCreatedByUserId().equals(authenticatedUserId))
+
+        if (!findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId()).getCreatedByUserId().equals(authenticatedUserId))
             throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
         return WorkspaceMapper.mapToReadWorkspace(addUserHelper(workspaceUserDto));
     }
