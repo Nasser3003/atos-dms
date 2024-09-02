@@ -24,9 +24,17 @@ public class DocumentAdminService extends AbstractDocumentService {
         super(repository, fileStorageService);
     }
 
-    @Override
-    public List<DocumentReadOnlyDto> getAllDocuments() {
+    public List<DocumentReadOnlyDto> getAllUserDocuments() {
         return repository.findAll().stream()
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId) {
+        return repository.findAll().stream()
+                .filter(f -> !f.isDeleted())
+                .filter(f -> f.getCreatedByUserId().equals(userId))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }

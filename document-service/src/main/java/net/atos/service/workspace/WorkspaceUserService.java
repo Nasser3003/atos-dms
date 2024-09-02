@@ -33,9 +33,21 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     @Override
     public List<WorkspaceReadDto> getAllWorkspaces() {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        return getAllWorkspaces(authenticatedUserId);
+    }
 
+    @Override
+    public List<WorkspaceReadDto> getAllWorkspaces(UUID userId) {
         return repository.findAll().stream()
-                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(authenticatedUserId))
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .map(WorkspaceMapper::mapToReadWorkspace)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces() {
+        return repository.findAll().stream()
+                .filter(w -> !w.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
     }
@@ -102,6 +114,17 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
         if (notWorkspaceMember(workspaceEntity))
             throw new UnauthorizedException("you arent a member of this workspace");
         return workspaceEntity.getDocuments().stream().map(DocumentMapper::mapToReadDocument).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId) {
+        if (!CustomJwtAuthenticationConverter.extractUserIdFromContext().equals(userId))
+            throw new UnauthorizedException("you dont have permissions to access this workspace");
+        return repository.findAll().stream()
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> !workspaceEntity.isDeleted())
+                .map(WorkspaceMapper::mapToReadWorkspace)
+                .collect(Collectors.toList());
     }
 
     @Override

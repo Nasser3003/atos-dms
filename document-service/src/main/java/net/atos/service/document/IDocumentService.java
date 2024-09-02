@@ -12,7 +12,9 @@ public interface IDocumentService {
 
     List<DocumentReadOnlyDto> getAllNoneDeletedDocuments();
 
-    List<DocumentReadOnlyDto> getAllDocuments();
+    List<DocumentReadOnlyDto> getAllUserDocuments();
+
+    List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId);
 
     List<DocumentReadOnlyDto> getAllDeletedDocuments();
 

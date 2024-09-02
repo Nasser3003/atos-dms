@@ -27,7 +27,7 @@ public class DocumentUserController extends AbstractDocumentController {
     @Override
     @GetMapping("/all")
     ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
-        return ResponseEntity.ok(documentService.getAllDocuments());
+        return ResponseEntity.ok(documentService.getAllUserDocuments());
     }
 
     @Override

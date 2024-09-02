@@ -27,25 +27,27 @@ public class DocumentUserService extends AbstractDocumentService {
     }
 
     @Override
-    public List<DocumentReadOnlyDto> getAllDocuments() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-
-        return repository.findAll().stream()
-                .filter(f -> !f.isDeleted())
-                .filter(f -> f.getCreatedByUserId().equals(authenticatedUserId))
-                .map(DocumentMapper::mapToReadDocument)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<DocumentReadOnlyDto> getAllNoneDeletedDocuments() {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
 
         return repository.findAll().stream()
                 .filter(f -> !f.isDeleted())
-                .filter(f -> f.getCreatedByUserId().equals(authenticatedUserId))
+                .filter(f -> f.getAccessibleByUsers().contains(authenticatedUserId))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllUserDocuments() {
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        return repository.findAll().stream()
+                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedUserId))
+                .map(DocumentMapper::mapToReadDocument)
+                .collect(Collectors.toList());    }
+
+    @Override
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId) {
+        throw new UnsupportedOperationException("This operation is not supported for this user type");
     }
 
     @Override
@@ -54,7 +56,7 @@ public class DocumentUserService extends AbstractDocumentService {
 
         return repository.findAll().stream()
                 .filter(DocumentEntity::isDeleted)
-                .filter(f -> f.getCreatedByUserId().equals(authenticatedUserId))
+                .filter(f -> f.getAccessibleByUsers().contains(authenticatedUserId))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());    }
 

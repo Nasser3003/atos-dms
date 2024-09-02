@@ -1,5 +1,6 @@
 package net.atos.service.workspace;
 
+import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.WorkspaceDocumentDto;
 import net.atos.dto.workspace.WorkspaceEditDto;
@@ -30,7 +31,22 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
 
     @Override
     public List<WorkspaceReadDto> getAllWorkspaces() {
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        return getAllWorkspaces(authenticatedUserId);
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getAllWorkspaces(UUID userId) {
         return repository.findAll().stream()
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .map(WorkspaceMapper::mapToReadWorkspace)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces() {
+        return repository.findAll().stream()
+                .filter(w -> !w.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
     }
@@ -73,6 +89,15 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     public List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceId);
         return workspaceEntity.getDocuments().stream().map(DocumentMapper::mapToReadDocument).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId) {
+        return repository.findAll().stream()
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> !workspaceEntity.isDeleted())
+                .map(WorkspaceMapper::mapToReadWorkspace)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -2,7 +2,6 @@ package net.atos.service.workspace;
 
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.workspace.*;
-import net.atos.model.DocumentEntity;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 
@@ -19,6 +18,10 @@ public interface IWorkspaceService {
 
     List<WorkspaceReadDto> getAllWorkspaces();
 
+    List<WorkspaceReadDto> getAllWorkspaces(UUID userId);
+
+    List<WorkspaceReadDto> getNoneDeletedWorkspaces();
+
     WorkspaceReadDto getWorkspace(UUID id);
 
     WorkspaceReadDto updateWorkspace(WorkspaceEditDto workspaceEditDto);
@@ -33,6 +36,7 @@ public interface IWorkspaceService {
 
     List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId);
 
+    List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId);
 }
 
 
