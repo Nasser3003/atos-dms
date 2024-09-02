@@ -3,8 +3,6 @@ package net.atos.service.document;
 import net.atos.dto.document.DocumentCreateDto;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,4 +23,7 @@ public interface IDocumentService {
     void deleteDocument(UUID id);
 
     FileDownloadInfo downloadDocument(UUID id);
+
+    PreviewFileResponse previewDocument(UUID id);
+
 }

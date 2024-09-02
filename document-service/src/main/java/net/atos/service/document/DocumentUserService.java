@@ -10,8 +10,6 @@ import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
 import net.atos.service.LocalFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +21,9 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentUserService extends AbstractDocumentService {
 
-    private final LocalFileStorageService localFileStorageService;
-
     @Autowired
     public DocumentUserService(DocumentRepository repository, LocalFileStorageService localFileStorageService) {
         super(repository, localFileStorageService);
-        this.localFileStorageService = localFileStorageService;
     }
 
     @Override
@@ -101,5 +96,13 @@ public class DocumentUserService extends AbstractDocumentService {
         } catch (IOException e) {
             throw new FileDownloadException("Error downloading file: ", e);
         }
+    }
+
+    @Override
+    public PreviewFileResponse previewDocument(UUID id) {
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
+        if (!documentEntity.isUserAuthorized(id))
+            throw new UnauthorizedException("don't have the privileges for Document with id " + id);
+        return previewFileHelper(id);
     }
 }

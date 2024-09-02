@@ -127,7 +127,6 @@ public class LocalFileStorageService {
         return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }
 
-
     @Getter
     public static class CustomMultipartFile implements MultipartFile {
 

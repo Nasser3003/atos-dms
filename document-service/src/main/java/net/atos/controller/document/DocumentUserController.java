@@ -4,6 +4,7 @@ import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.service.document.DocumentUserService;
 import net.atos.service.document.FileDownloadInfo;
+import net.atos.service.document.PreviewFileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -57,5 +58,10 @@ public class DocumentUserController extends AbstractDocumentController {
                 .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
                 .contentLength(fileInfo.getContentLength())
                 .body(fileInfo.getResource());
+    }
+
+    @Override
+    ResponseEntity<PreviewFileResponse> previewFile(UUID id) {
+        return ResponseEntity.ok(documentService.previewDocument(id));
     }
 }

@@ -77,4 +77,9 @@ public class DocumentAdminService extends AbstractDocumentService {
         }
     }
 
+    @Override
+    public PreviewFileResponse previewDocument(UUID id) {
+        return previewFileHelper(id);
+    }
+
 }

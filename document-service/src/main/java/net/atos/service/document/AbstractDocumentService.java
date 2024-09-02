@@ -14,15 +14,13 @@ import net.atos.util.LocalFileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -110,6 +108,27 @@ public abstract class AbstractDocumentService implements IDocumentService {
         Resource resource = new InputStreamResource(Files.newInputStream(filePath));
 
         return new FileDownloadInfo(resource, fileName, contentType, contentLength);
+    }
+
+    PreviewFileResponse previewFileHelper(UUID documentId) {
+        if (documentId == null)
+            throw new IllegalArgumentException("Document ID cannot be null");
+
+        Path filePath = fileStorageService.getFilePathById(documentId);
+        if (filePath == null || !Files.exists(filePath))
+            throw new NotFoundException("File not found for document ID: " + documentId);
+
+        byte[] fileContent;
+        try {
+            fileContent = Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading file content for document ID: " + documentId, e);
+        }
+
+        String base64Encoded = Base64.getEncoder().encodeToString(fileContent);
+        String fileName = filePath.getFileName().toString();
+
+        return new PreviewFileResponse(fileName, base64Encoded);
     }
 
     private DocumentEntity findDocumentById(UUID id) {
