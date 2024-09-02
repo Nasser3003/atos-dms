@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import static net.atos.util.LocalFileUtil.concatPathToUserIdFolder;
 
+
 @Service
 public class LocalFileStorageService {
 
@@ -83,9 +84,7 @@ public class LocalFileStorageService {
         DocumentEntity documentEntity = documentRepository.findById(documentId).orElseThrow(
                 () -> new FileStorageException("Document not found."));
 
-        Path fullPath = concatPathToUserIdFolder(documentEntity.getCreatedByUserId().toString(), documentEntity.getFilePath());
-        Path validatedPath = validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(),fullPath.toString());
-
+        Path validatedPath = validateAndNormalizePath(documentEntity.getCreatedByUserId(), documentEntity.getFilePath());
 
         try (Stream<Path> pathStream = Files.walk(validatedPath.getParent(), 1)) {
             return pathStream
@@ -123,6 +122,11 @@ public class LocalFileStorageService {
     public MultipartFile getMultipartFile(Path filePath) throws IOException {
         return new CustomMultipartFile(filePath);
     }
+
+    private Path validateAndNormalizePath(String relativePath){
+        return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
+    }
+
 
     @Getter
     public static class CustomMultipartFile implements MultipartFile {
@@ -162,10 +166,6 @@ public class LocalFileStorageService {
                 os.write(bytes);
             }
         }
-    }
-
-    private Path validateAndNormalizePath(String relativePath){
-        return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }
 
 }

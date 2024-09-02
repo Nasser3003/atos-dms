@@ -15,6 +15,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -240,4 +241,28 @@ public class DocumentEntity {
         }
     }
 
+    @Override
+    public String toString() {
+        return "DocumentEntity{" +
+                "id=" + id +
+                ", storageUrl='" + storageUrl + '\'' +
+                ", filePath='" + filePath + '\'' +
+                ", type=" + type +
+                ", dateOfCreation=" + dateOfCreation +
+                ", lastAccessed=" + lastAccessed +
+                ", lastAccessedByUserId=" + lastAccessedByUserId +
+                ", lastModified=" + lastModified +
+                ", sizeInBytes=" + sizeInBytes +
+                ", createdByUserId=" + createdByUserId +
+                ", accessibleByUsers=" + accessibleByUsers +
+                ", lastModifiedByUserId=" + lastModifiedByUserId +
+                ", tags=" + tags +
+                ", isPublic=" + isPublic +
+                ", isDeleted=" + isDeleted +
+                ", thumbnailPath='" + thumbnailPath + '\'' +
+                ", workspaces=" + workspaces.stream().map(WorkspaceEntity::getName).collect(Collectors.toSet()) +
+                ", languages=" + languages +
+                ", attributes=" + attributes +
+                '}';
+    }
 }

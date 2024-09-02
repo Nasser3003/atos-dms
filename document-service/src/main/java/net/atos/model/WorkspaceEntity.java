@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
@@ -106,4 +107,17 @@ public class WorkspaceEntity {
         document.removeWorkspace(this);
     }
 
+    @Override
+    public String toString() {
+        return "WorkspaceEntity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", dateOfCreation=" + dateOfCreation +
+                ", createdByUserId=" + createdByUserId +
+                ", workspaces=" + documents.stream().map(DocumentEntity::getId).collect(Collectors.toSet()) +
+                ", accessibleByUsers=" + accessibleByUsers +
+                ", isDeleted=" + isDeleted +
+                '}';
+    }
 }
