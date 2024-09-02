@@ -96,7 +96,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return documentEntity;
     }
 
-    public ResponseEntity<Resource> downloadFileHelper(UUID documentId) throws IOException {
+    FileDownloadInfo downloadFileHelper(UUID documentId) throws IOException {
         Path filePath = fileStorageService.getFilePathById(documentId);
 
         if (!Files.exists(filePath) || !Files.isReadable(filePath))
@@ -105,14 +105,11 @@ public abstract class AbstractDocumentService implements IDocumentService {
         String fileName = filePath.getFileName().toString();
         String contentType = Files.probeContentType(filePath);
         contentType = (contentType != null) ? contentType : "application/octet-stream";
+        long contentLength = Files.size(filePath);
 
         Resource resource = new InputStreamResource(Files.newInputStream(filePath));
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .contentType(MediaType.parseMediaType(contentType))
-                .contentLength(Files.size(filePath))
-                .body(resource);
+        return new FileDownloadInfo(resource, fileName, contentType, contentLength);
     }
 
     private DocumentEntity findDocumentById(UUID id) {

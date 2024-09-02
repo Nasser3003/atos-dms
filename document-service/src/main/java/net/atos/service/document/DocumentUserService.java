@@ -92,7 +92,7 @@ public class DocumentUserService extends AbstractDocumentService {
     }
 
     @Override
-    public ResponseEntity<Resource> downloadDocument(UUID id) {
+    public FileDownloadInfo downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         if (!documentEntity.isUserAuthorized(id))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);

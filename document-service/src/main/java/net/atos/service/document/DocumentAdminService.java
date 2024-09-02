@@ -8,8 +8,6 @@ import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
 import net.atos.service.LocalFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +69,7 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
-    public ResponseEntity<Resource> downloadDocument(UUID id) {
+    public FileDownloadInfo downloadDocument(UUID id) {
         try {
             return downloadFileHelper(id);
         } catch (IOException e) {

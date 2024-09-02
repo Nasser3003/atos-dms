@@ -3,8 +3,11 @@ package net.atos.controller.document;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.service.document.DocumentAdminService;
+import net.atos.service.document.FileDownloadInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +51,13 @@ public class DocumentAdminController extends AbstractDocumentController {
     }
 
     @Override
-    @PostMapping("/download/{id}")
+    @GetMapping("/download/{id}")
     ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
-        return documentService.downloadDocument(id);
+        FileDownloadInfo fileInfo = documentService.downloadDocument(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileInfo.getFileName() + "\"")
+                .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
+                .contentLength(fileInfo.getContentLength())
+                .body(fileInfo.getResource());
     }
 }

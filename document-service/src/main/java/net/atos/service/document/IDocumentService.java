@@ -24,5 +24,5 @@ public interface IDocumentService {
 
     void deleteDocument(UUID id);
 
-    ResponseEntity<Resource> downloadDocument(UUID id);
+    FileDownloadInfo downloadDocument(UUID id);
 }
