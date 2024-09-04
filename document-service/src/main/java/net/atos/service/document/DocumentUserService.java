@@ -91,7 +91,8 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public FileDownloadInfo downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        if (!documentEntity.isUserAuthorized(id))
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedUserId))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         try {
             return downloadFileHelper(id);
@@ -103,7 +104,8 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public PreviewFileResponse previewDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        if (!documentEntity.isUserAuthorized(id))
+        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedUserId))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return previewFileHelper(id);
     }

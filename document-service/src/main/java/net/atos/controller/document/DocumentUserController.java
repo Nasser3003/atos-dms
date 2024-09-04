@@ -27,7 +27,7 @@ public class DocumentUserController extends AbstractDocumentController {
     @Override
     @GetMapping("/all")
     ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
-        return ResponseEntity.ok(documentService.getAllUserDocuments());
+        return ResponseEntity.ok(documentService.getAllNoneDeletedDocuments());
     }
 
     @Override
@@ -61,7 +61,8 @@ public class DocumentUserController extends AbstractDocumentController {
     }
 
     @Override
-    ResponseEntity<PreviewFileResponse> previewFile(UUID id) {
+    @GetMapping("/preview/{id}")
+    ResponseEntity<PreviewFileResponse> previewFile(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.previewDocument(id));
     }
 }

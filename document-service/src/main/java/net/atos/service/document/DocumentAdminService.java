@@ -26,6 +26,7 @@ public class DocumentAdminService extends AbstractDocumentService {
 
     public List<DocumentReadOnlyDto> getAllUserDocuments() {
         return repository.findAll().stream()
+                .filter(f -> !f.isDeleted())
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }
