@@ -29,9 +29,7 @@ public abstract class AbstractSearchService {
     abstract List<DocumentEntity> searchDocumentsByName(String name);
 
     abstract List<DocumentEntity> searchDocumentsByTag(String tag);
-
-    abstract List<DocumentEntity> searchIsDeleted(boolean isDeleted);
-
+    
     List<DocumentEntity> searchDocumentsByTypeHelper(EnumDataType type) {
         return documentRepository.findAllByType(type);
     }
@@ -44,7 +42,4 @@ public abstract class AbstractSearchService {
         return documentRepository.findAllByTagsContainingIgnoreCase(tag);
     }
 
-    List<DocumentEntity> searchIsDeletedHelper(boolean isDeleted) {
-        return documentRepository.findAllByIsDeleted(isDeleted);
-    }
 }

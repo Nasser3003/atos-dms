@@ -34,8 +34,4 @@ public class UserSearchApi {
         return ResponseEntity.ok(searchService.searchDocumentsByTag(tag));
     }
 
-    @GetMapping("/deleted")
-    public ResponseEntity<List<DocumentEntity>> searchIsDeleted(@RequestParam(name = "deleted") boolean deleted) {
-        return ResponseEntity.ok(searchService.searchIsDeleted(deleted));
-    }
 }

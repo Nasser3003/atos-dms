@@ -34,9 +34,4 @@ public class UserSearchService extends AbstractSearchService {
         return getAccessibleDocuments(documents);
     }
 
-    @Override
-    public List<DocumentEntity> searchIsDeleted(boolean isDeleted) {
-        List<DocumentEntity> documents = searchIsDeletedHelper(isDeleted);
-        return getAccessibleDocuments(documents);
-    }
 }

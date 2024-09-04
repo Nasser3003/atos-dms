@@ -11,5 +11,4 @@ public interface DocumentRepository extends MongoRepository<DocumentEntity, UUID
     List<DocumentEntity> findAllByType(EnumDataType type);
     List<DocumentEntity> findAllByTagsContainingIgnoreCase(String tag);
     List<DocumentEntity> findAllByFilePathContaining(String name);
-    List<DocumentEntity> findAllByIsDeleted(boolean isDeleted);
 }

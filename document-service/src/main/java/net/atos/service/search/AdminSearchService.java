@@ -16,7 +16,6 @@ public class AdminSearchService extends AbstractSearchService {
         super(documentRepository);
     }
 
-
     @Override
     public List<DocumentEntity> searchDocumentsByType(EnumDataType type) {
         return searchDocumentsByTypeHelper(type);
@@ -32,8 +31,4 @@ public class AdminSearchService extends AbstractSearchService {
         return searchDocumentsByTagHelper(tag);
     }
 
-    @Override
-    public List<DocumentEntity> searchIsDeleted(boolean isDeleted) {
-        return searchIsDeletedHelper(isDeleted);
-    }
 }

@@ -205,6 +205,14 @@ public class DocumentEntity {
         return new HashSet<>(accessibleByUsers);
     }
 
+    public void addTag(String tag) {
+        tags.add(tag.toLowerCase());
+    }
+
+    public void removeTag(String tag) {
+        tags.remove(tag.toLowerCase());
+    }
+
     public void addWorkspace(WorkspaceEntity workspace) {
         if (workspace == null)
             throw new IllegalArgumentException("Workspace cannot be null");

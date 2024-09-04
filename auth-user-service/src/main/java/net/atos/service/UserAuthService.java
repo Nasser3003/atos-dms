@@ -39,6 +39,7 @@ public class UserAuthService {
                         .getEmail(),authDto.getPassword())
         );
 
+
         String token = jwtTokenService.generateJWT(auth, util.findUserByEmail(authDto.getEmail()).getId());
         UserEntity user = util.findUserByEmail(authDto.getEmail());
 
