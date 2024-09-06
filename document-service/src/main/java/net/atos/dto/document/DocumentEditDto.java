@@ -1,9 +1,8 @@
 package net.atos.dto.document;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.UUIDDeserializer;
 import lombok.*;
 import net.atos.model.enums.EnumDataType;
+import net.atos.model.enums.EnumLanguages;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -28,4 +27,7 @@ public class DocumentEditDto {
     private Set<String> tags;
 
     private Boolean isPublic;
+
+    private Set<EnumLanguages> languages;
+
 }

@@ -81,6 +81,8 @@ public abstract class AbstractDocumentService implements IDocumentService {
             entity.setTags(documentEditDto.getTags());
         if (documentEditDto.getIsPublic() != null)
             entity.setPublic(documentEditDto.getIsPublic());
+        if (documentEditDto.getLanguages() != null)
+            entity.setLanguages(documentEditDto.getLanguages());
 
         repository.save(entity);
 

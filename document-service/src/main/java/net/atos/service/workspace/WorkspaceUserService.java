@@ -43,6 +43,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     public List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId) {
         return repository.findAll().stream()
                 .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(w -> !w.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
     }

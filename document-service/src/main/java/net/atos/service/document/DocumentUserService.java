@@ -63,7 +63,8 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        if (!documentEntity.isUserAuthorized(id))
+        UUID authenticatedId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedId))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return DocumentMapper.mapToReadDocument(documentEntity);
     }

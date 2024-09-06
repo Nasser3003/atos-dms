@@ -29,7 +29,7 @@ public class DocumentAdminController extends AbstractDocumentController {
     @Override
     @GetMapping("/all")
     ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments() {
-        return ResponseEntity.ok(documentService.getAllUserDocuments());
+            return ResponseEntity.ok(documentService.getAllUserDocuments());
     }
 
     @Override

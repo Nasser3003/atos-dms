@@ -36,6 +36,7 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     @Override
     public List<WorkspaceReadDto> getAllWorkspaces() {
         return repository.findAll().stream()
+                .filter(w -> !w.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
     }
