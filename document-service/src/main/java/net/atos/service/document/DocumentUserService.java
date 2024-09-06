@@ -3,7 +3,9 @@ package net.atos.service.document;
 import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentUserDto;
 import net.atos.exception.FileDownloadException;
+import net.atos.exception.NotFoundException;
 import net.atos.exception.UnauthorizedException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
@@ -109,5 +111,27 @@ public class DocumentUserService extends AbstractDocumentService {
         if (!documentEntity.isUserAuthorized(authenticatedUserId))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return previewFileHelper(id);
+    }
+
+    @Override
+    public DocumentReadOnlyDto addUser(DocumentUserDto documentUserDto) {
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
+        UUID authenticatedUser = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (documentEntity.isDeleted())
+            throw new NotFoundException("Document doesnt exist");
+        if (!documentEntity.getCreatedByUserId().equals(authenticatedUser))
+            throw new UnauthorizedException("don't have the privileges for Document with id " + documentUserDto.getDocumentId());
+        return DocumentMapper.mapToReadDocument(addUserHelper(documentUserDto));
+    }
+
+    @Override
+    public DocumentReadOnlyDto removeUser(DocumentUserDto documentUserDto) {
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
+        UUID authenticatedUser = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        if (documentEntity.isDeleted())
+            throw new NotFoundException("Document doesnt exist");
+        if (!documentEntity.getCreatedByUserId().equals(authenticatedUser))
+            throw new UnauthorizedException("don't have the privileges for Document with id " + documentUserDto.getDocumentId());
+        return DocumentMapper.mapToReadDocument(removeUserHelper(documentUserDto));
     }
 }

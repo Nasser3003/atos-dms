@@ -3,6 +3,7 @@ package net.atos.service.document;
 import net.atos.dto.document.DocumentCreateDto;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentUserDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,5 +28,10 @@ public interface IDocumentService {
     FileDownloadInfo downloadDocument(UUID id);
 
     PreviewFileResponse previewDocument(UUID id);
+
+    DocumentReadOnlyDto addUser(DocumentUserDto documentUserDto);
+
+    DocumentReadOnlyDto removeUser(DocumentUserDto documentUserDto);
+
 
 }

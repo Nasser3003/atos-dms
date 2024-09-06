@@ -2,6 +2,7 @@ package net.atos.service.document;
 
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentUserDto;
 import net.atos.exception.FileDownloadException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
@@ -89,6 +90,16 @@ public class DocumentAdminService extends AbstractDocumentService {
     @Override
     public PreviewFileResponse previewDocument(UUID id) {
         return previewFileHelper(id);
+    }
+
+    @Override
+    public DocumentReadOnlyDto addUser(DocumentUserDto documentUserDto) {
+        return DocumentMapper.mapToReadDocument(addUserHelper(documentUserDto));
+    }
+
+    @Override
+    public DocumentReadOnlyDto removeUser(DocumentUserDto documentUserDto) {
+        return DocumentMapper.mapToReadDocument(removeUserHelper(documentUserDto));
     }
 
 }

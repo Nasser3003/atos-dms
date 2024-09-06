@@ -73,7 +73,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
 
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(id);
-        if (workspaceEntity.getCreatedByUserId().equals(authenticatedUserId))
+        if (!workspaceEntity.getCreatedByUserId().equals(authenticatedUserId))
             throw new UnauthorizedException("you dont have permissions to delete this workspace");
         workspaceEntity.setDeleted(true);
         repository.save(workspaceEntity);

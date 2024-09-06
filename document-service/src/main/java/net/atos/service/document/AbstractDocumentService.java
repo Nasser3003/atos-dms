@@ -5,6 +5,7 @@ import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.dto.document.DocumentCreateDto;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentUserDto;
 import net.atos.exception.NotFoundException;
 import net.atos.mapper.DocumentMapper;
 import net.atos.model.DocumentEntity;
@@ -84,6 +85,9 @@ public abstract class AbstractDocumentService implements IDocumentService {
         if (documentEditDto.getLanguages() != null)
             entity.setLanguages(documentEditDto.getLanguages());
 
+        entity.setLastModified(LocalDateTime.now());
+        entity.setLastModifiedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+
         repository.save(entity);
 
         return DocumentMapper.mapToReadDocument(entity);
@@ -109,6 +113,11 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         Resource resource = new InputStreamResource(Files.newInputStream(filePath));
 
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentId);
+        documentEntity.setLastAccessed(LocalDateTime.now());
+        documentEntity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        repository.save(documentEntity);
+
         return new FileDownloadInfo(resource, fileName, contentType, contentLength);
     }
 
@@ -130,7 +139,39 @@ public abstract class AbstractDocumentService implements IDocumentService {
         String base64Encoded = Base64.getEncoder().encodeToString(fileContent);
         String fileName = filePath.getFileName().toString();
 
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentId);
+        documentEntity.setLastAccessed(LocalDateTime.now());
+        documentEntity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        repository.save(documentEntity);
+
+
         return new PreviewFileResponse(fileName, base64Encoded);
+    }
+
+    DocumentEntity addUserHelper(DocumentUserDto documentUserDto) {
+        if (documentUserDto.getUserId() == null)
+            throw new IllegalArgumentException("user not found");
+        if (documentUserDto.getDocumentId() == null)
+            throw new IllegalArgumentException("document not found");
+
+        UUID userId = documentUserDto.getUserId();
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
+        documentEntity.addUser(userId);
+        repository.save(documentEntity);
+        return documentEntity;
+    }
+
+    DocumentEntity removeUserHelper(DocumentUserDto documentUserDto) {
+        if (documentUserDto.getUserId() == null)
+            throw new IllegalArgumentException("user not found");
+        if (documentUserDto.getDocumentId() == null)
+            throw new IllegalArgumentException("document not found");
+
+        UUID userId = documentUserDto.getUserId();
+        DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
+        documentEntity.removeUser(userId);
+        repository.save(documentEntity);
+        return documentEntity;
     }
 
     private DocumentEntity findDocumentById(UUID id) {
@@ -138,5 +179,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 .orElseThrow(() -> new NotFoundException("Document with id " + id + " not found"));
 
     }
+
+
 
 }

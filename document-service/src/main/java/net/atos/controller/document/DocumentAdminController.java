@@ -2,6 +2,7 @@ package net.atos.controller.document;
 
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
+import net.atos.dto.document.DocumentUserDto;
 import net.atos.service.document.DocumentAdminService;
 import net.atos.service.document.FileDownloadInfo;
 import net.atos.service.document.PreviewFileResponse;
@@ -66,5 +67,17 @@ public class DocumentAdminController extends AbstractDocumentController {
     @GetMapping("/preview/{id}")
     public ResponseEntity<PreviewFileResponse> previewFile(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.previewDocument(id));
+    }
+
+    @Override
+    @PutMapping("/add/user")
+    ResponseEntity<DocumentReadOnlyDto> addUserToDocument(@RequestBody DocumentUserDto documentUserDto) {
+        return ResponseEntity.ok(documentService.addUser(documentUserDto));
+    }
+
+    @Override
+    @PutMapping ("/rm/user")
+    ResponseEntity<DocumentReadOnlyDto> removeUserToDocument(@RequestBody DocumentUserDto documentUserDto) {
+        return ResponseEntity.ok(documentService.removeUser(documentUserDto));
     }
 }
