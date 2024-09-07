@@ -1,7 +1,6 @@
 package net.atos.service;
 
 import lombok.Getter;
-import net.atos.configuration.CustomJwtAuthenticationConverter;
 import net.atos.exception.FileStorageException;
 import net.atos.model.DocumentEntity;
 import net.atos.repository.DocumentRepository;
@@ -36,11 +35,11 @@ public class LocalFileStorageService {
         }
     }
 
-    public void storeFile(MultipartFile file, String pathInsideUserFolder) throws FileStorageException {
+    public void storeFile(UUID userId, MultipartFile file, String pathInsideUserFolder) throws FileStorageException {
         if (file.isEmpty())
             throw new FileStorageException("Failed to store empty file.");
 
-        Path fullPath = validateAndNormalizePath(pathInsideUserFolder);
+        Path fullPath = validateAndNormalizePath(userId, pathInsideUserFolder);
 
         String originalFilename = LocalFileUtil.extractFileName(pathInsideUserFolder);
         try {
@@ -53,9 +52,9 @@ public class LocalFileStorageService {
         }
     }
 
-    public void renameFile(String oldPath, String newPath) throws FileStorageException {
-        Path fullOldPath = validateAndNormalizePath(oldPath);
-        Path fullNewPath = validateAndNormalizePath(newPath);
+    public void renameFile(UUID owner, String oldPath, String newPath) throws FileStorageException {
+        Path fullOldPath = validateAndNormalizePath(owner, oldPath);
+        Path fullNewPath = validateAndNormalizePath(owner, newPath);
 
         if (Files.exists(fullNewPath))
             throw new FileStorageException("there is a file with the same name at destination : " + newPath);
@@ -96,8 +95,8 @@ public class LocalFileStorageService {
         }
     }
 
-    public void deleteFile(String userSpecifiedPath) throws FileStorageException {
-        Path fullPath = validateAndNormalizePath(userSpecifiedPath);
+    public void deleteFile(UUID userId, String userSpecifiedPath) throws FileStorageException {
+        Path fullPath = validateAndNormalizePath(userId,userSpecifiedPath);
 
         try {
             if (!Files.deleteIfExists(fullPath))
@@ -121,10 +120,6 @@ public class LocalFileStorageService {
 
     public MultipartFile getMultipartFile(Path filePath) throws IOException {
         return new CustomMultipartFile(filePath);
-    }
-
-    private Path validateAndNormalizePath(String relativePath){
-        return validateAndNormalizePath(CustomJwtAuthenticationConverter.extractUserIdFromContext(), relativePath);
     }
 
     @Getter

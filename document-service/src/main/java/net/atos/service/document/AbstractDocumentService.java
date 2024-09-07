@@ -47,7 +47,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 userId
         );
 
-        fileStorageService.storeFile(createDto.getFile(), sanitizedFileName);
+        fileStorageService.storeFile(userId, createDto.getFile(), sanitizedFileName);
         repository.save(documentEntity);
 
         return DocumentMapper.mapToReadDocument(documentEntity);
@@ -68,7 +68,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         if (documentEditDto.getFilePath() != null && !documentEditDto.getFilePath().isBlank())
             if (!oldPath.equals(documentEditDto.getFilePath()))
-                fileStorageService.renameFile(oldPath, documentEditDto.getFilePath());
+                fileStorageService.renameFile(entity.getCreatedByUserId(), oldPath, documentEditDto.getFilePath());
 
         if (documentEditDto.getFilePath() != null)
             entity.setFilePath(documentEditDto.getFilePath());
