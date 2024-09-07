@@ -64,8 +64,6 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         DocumentEntity entity = findNoneDeletedDocumentById(documentEditDto.getId());
 
-        entity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
-        entity.setLastAccessed(LocalDateTime.now());
         String oldPath = findNoneDeletedDocumentById(documentEditDto.getId()).getFilePath();
 
         if (documentEditDto.getFilePath() != null && !documentEditDto.getFilePath().isBlank())
@@ -73,9 +71,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 fileStorageService.renameFile(oldPath, documentEditDto.getFilePath());
 
         if (documentEditDto.getFilePath() != null)
-            entity.setFilePath(fileStorageService.baseStorageLocation
-                    .resolve(CustomJwtAuthenticationConverter.extractUserIdFromContext().toString())
-                    .resolve(documentEditDto.getFilePath()).toString());
+            entity.setFilePath(documentEditDto.getFilePath());
         if (documentEditDto.getType() != null)
             entity.setType(documentEditDto.getType());
         if (documentEditDto.getTags() != null)
