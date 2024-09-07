@@ -7,8 +7,7 @@ import net.atos.model.enums.EnumDataType;
 import net.atos.repository.DocumentRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,11 +16,27 @@ public abstract class AbstractSearchService {
 
     private final DocumentRepository documentRepository;
 
-    public List<DocumentEntity> getAccessibleDocuments(List<DocumentEntity> documents) {
+    List<DocumentEntity> getAccessibleDocuments(List<DocumentEntity> documents) {
         UUID authenticatedId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         return documents.stream()
+                .filter(documentEntity -> !documentEntity.isDeleted())
                 .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedId))
                 .collect(Collectors.toList());
+    }
+
+    abstract Set<DocumentEntity> search(String query);
+
+    Set<DocumentEntity> searchHelper(String query) {
+        List<DocumentEntity> allResults = new ArrayList<>();
+        List<DocumentEntity> searchByName = searchDocumentsByNameHelper(query);
+        List<DocumentEntity> searchByTag = searchDocumentsByTagHelper(query);
+        List<DocumentEntity> searchByType = searchDocumentsByPartialType(query);
+
+        allResults.addAll(searchByName);
+        allResults.addAll(searchByTag);
+        allResults.addAll(searchByType);
+
+        return new HashSet<>(allResults);
     }
 
     abstract List<DocumentEntity> searchDocumentsByType(EnumDataType type);
@@ -29,17 +44,43 @@ public abstract class AbstractSearchService {
     abstract List<DocumentEntity> searchDocumentsByName(String name);
 
     abstract List<DocumentEntity> searchDocumentsByTag(String tag);
-    
+
     List<DocumentEntity> searchDocumentsByTypeHelper(EnumDataType type) {
-        return documentRepository.findAllByType(type);
+        return documentRepository.findAllByType(type).stream()
+                .filter(documentEntity -> !documentEntity.isDeleted()).collect(Collectors.toList());
     }
 
     List<DocumentEntity> searchDocumentsByNameHelper(String name) {
-        return documentRepository.findAllByFilePathContaining(name);
+        if (name == null || name.isEmpty())
+            return new ArrayList<>();
+        return documentRepository.findAllByFilePathContainingIgnoreCase(name).stream()
+                .filter(documentEntity -> !documentEntity.isDeleted()).collect(Collectors.toList());
     }
 
     List<DocumentEntity> searchDocumentsByTagHelper(String tag) {
-        return documentRepository.findAllByTagsContainingIgnoreCase(tag);
+        if (tag == null || tag.isEmpty())
+            return new ArrayList<>();
+        return documentRepository.findAllByTagsContainingIgnoreCase(tag).stream()
+                .filter(documentEntity -> !documentEntity.isDeleted()).collect(Collectors.toList());
+    }
+
+    List<DocumentEntity> searchDocumentsByPartialType(String partialType) {
+        if (partialType == null || partialType.isEmpty())
+            return new ArrayList<>();
+
+        String lowerCaseSearchTerm = partialType.toLowerCase();
+
+        List<EnumDataType> matchingTypes = Arrays.stream(EnumDataType.values())
+                .filter(enumValue -> enumValue.name().toLowerCase().contains(lowerCaseSearchTerm))
+                .collect(Collectors.toList());
+
+        if (matchingTypes.isEmpty())
+            return new ArrayList<>();
+
+        return matchingTypes.stream()
+                .flatMap(type -> searchDocumentsByTypeHelper(type).stream())
+                .collect(Collectors.toList())
+                .stream().filter(documentEntity -> !documentEntity.isDeleted()).collect(Collectors.toList());
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AdminSearchService extends AbstractSearchService {
@@ -14,6 +15,11 @@ public class AdminSearchService extends AbstractSearchService {
     @Autowired
     public AdminSearchService(DocumentRepository documentRepository) {
         super(documentRepository);
+    }
+
+    @Override
+    public Set<DocumentEntity> search(String query) {
+        return searchHelper(query);
     }
 
     @Override

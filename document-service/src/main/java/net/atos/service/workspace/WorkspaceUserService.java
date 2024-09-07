@@ -94,7 +94,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     public WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto) {
         UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
         if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
-            throw new UnauthorizedException("you dont have permissions to add this User");
+            throw new UnauthorizedException("you dont have permissions to remove this User");
         if (!findNoneDeletedWorkspace(workspaceUserDto.getUserId()).getCreatedByUserId().equals(authenticatedUserId))
             throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
         return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
@@ -126,7 +126,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
             throw new UnauthorizedException("You are not authorized to add documents to this workspace");
         if (documentRepository.findById(addDocumentWorkspace.getDocumentId()).isPresent())
             if (!documentRepository.findById(addDocumentWorkspace.getDocumentId()).get().getCreatedByUserId().equals(CustomJwtAuthenticationConverter.extractUserIdFromContext()))
-                throw new UnauthorizedException("You are not authorized to add documents to this workspace");
+                throw new UnauthorizedException("You are not authorized to share this document");
         return WorkspaceMapper.mapToReadWorkspace(addDocumentHelper(addDocumentWorkspace));
     }
 
@@ -134,10 +134,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     public WorkspaceReadDto removeDocument(WorkspaceDocumentDto removeDocumentWorkspace) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(removeDocumentWorkspace.getWorkspaceId());
         if (notWorkspaceOwner(workspaceEntity))
-            throw new UnauthorizedException("You are not authorized to add documents to this workspace");
-        if (documentRepository.findById(removeDocumentWorkspace.getDocumentId()).isPresent())
-            if (!documentRepository.findById(removeDocumentWorkspace.getDocumentId()).get().getCreatedByUserId().equals(CustomJwtAuthenticationConverter.extractUserIdFromContext()))
-                throw new UnauthorizedException("You are not authorized to add documents to this workspace");
+            throw new UnauthorizedException("You are not authorized to this workspace");
         return WorkspaceMapper.mapToReadWorkspace(removeDocumentHelper(removeDocumentWorkspace));
     }
 }
