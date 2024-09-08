@@ -4,8 +4,11 @@ server:
 spring:
   data:
     mongodb:
+      auto-index-creation: true
       uri: mongodb://localhost:27017/atos_document_service
-      
+
+
+
   servlet:
     multipart:
       max-file-size: 10000MB

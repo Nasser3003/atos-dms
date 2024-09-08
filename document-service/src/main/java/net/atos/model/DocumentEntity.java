@@ -6,6 +6,8 @@ import net.atos.exception.AttributeException;
 import net.atos.model.enums.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@CompoundIndex(def = "{'filePath': 'text', 'tags': 'text'}")
 @Document(collection = "documents")
 public class DocumentEntity {
 
@@ -45,9 +48,11 @@ public class DocumentEntity {
     private String storageUrl;
 
     @NotBlank
+    @Indexed
     private String filePath;
 
     @NotBlank
+    @Indexed
     private EnumDataType type;
 
     @Field("date_of_creation")
