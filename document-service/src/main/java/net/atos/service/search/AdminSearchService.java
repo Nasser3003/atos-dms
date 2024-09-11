@@ -22,19 +22,4 @@ public class AdminSearchService extends AbstractSearchService {
         return searchHelper(query);
     }
 
-    @Override
-    public List<DocumentEntity> searchDocumentsByType(EnumDataType type) {
-        return searchDocumentsByTypeHelper(type);
-    }
-
-    @Override
-    public List<DocumentEntity> searchDocumentsByName(String name) {
-        return searchDocumentsByNameHelper(name);
-    }
-
-    @Override
-    public List<DocumentEntity> searchDocumentsByTag(String tag) {
-        return searchDocumentsByTagHelper(tag);
-    }
-
 }

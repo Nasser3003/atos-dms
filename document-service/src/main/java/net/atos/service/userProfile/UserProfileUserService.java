@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,15 +20,15 @@ public class UserProfileUserService extends AbstractUserProfileService {
         super(documentUserService, workspaceUserService);
     }
 
-
-    public List<DocumentReadOnlyDto> getNoneDeletedDocuments(UUID userId) {
-        UUID authenticatedId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+    @Override
+    public List<DocumentReadOnlyDto> getNoneDeletedDocuments(String userEmail) {
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
         List<DocumentReadOnlyDto> documents = documentService.getAllNoneDeletedDocuments();
-        return documents.stream().filter(doc -> doc.getAccessibleByUsers().contains(authenticatedId)).collect(Collectors.toList());
+        return documents.stream().filter(doc -> doc.getAccessibleByUsers().contains(authenticatedEmail)).collect(Collectors.toList());
     }
 
-    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId) {
-        List<WorkspaceReadDto> documents = workspaceService.getNoneDeletedWorkspaces(userId);
-        return new ArrayList<>(workspaceService.getNoneDeletedWorkspaces(userId));
+    @Override
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(String userEmail) {
+        return new ArrayList<>(workspaceService.getNoneDeletedWorkspaces(userEmail));
     }
 }

@@ -20,7 +20,7 @@ public class DocumentReadOnlyDto {
     private String filePath;
     private EnumDataType type;
     private Long sizeInBytes;
-    private Set<UUID> accessibleByUsers;
+    private Set<String> accessibleByUsers;
     private Set<String> tags;
     private boolean isPublic;
     private String thumbnailPath;
@@ -30,9 +30,9 @@ public class DocumentReadOnlyDto {
     private LocalDateTime dateOfCreation;
     private LocalDateTime lastAccessed;
     private LocalDateTime lastModified;
-    private UUID createdByUserId;
-    private UUID lastModifiedByUserId;
-    private UUID lastAccessedByUserId;
+    private String createdByUser;
+    private String lastModifiedByUser;
+    private String lastAccessedByUser;
     private Set<WorkspaceSimpleDto> workspaces;
 
 

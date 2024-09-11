@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
@@ -25,15 +24,15 @@ public class ProfileAdminController extends AbstractProfileController {
     }
 
     @Override
-    @GetMapping("/documents/{userId}")
-    ResponseEntity<List<DocumentReadOnlyDto>> getNoneDeletedDocuments(@PathVariable UUID userId) {
-        return ResponseEntity.ok(profileService.getNoneDeletedDocuments(userId));
+    @GetMapping("/documents/{userEmail}")
+    ResponseEntity<List<DocumentReadOnlyDto>> getNoneDeletedDocuments(@PathVariable String userEmail) {
+        return ResponseEntity.ok(profileService.getNoneDeletedDocuments(userEmail));
     }
 
     @Override
-    @GetMapping("/workspaces/{userId}")
-    ResponseEntity<List<WorkspaceReadDto>> getNoneDeletedWorkspaces(@PathVariable UUID userId) {
-        return ResponseEntity.ok(profileService.getNoneDeletedWorkspaces(userId));
+    @GetMapping("/workspaces/{userEmail}")
+    ResponseEntity<List<WorkspaceReadDto>> getNoneDeletedWorkspaces(@PathVariable String userEmail) {
+        return ResponseEntity.ok(profileService.getNoneDeletedWorkspaces(userEmail));
     }
 
 }

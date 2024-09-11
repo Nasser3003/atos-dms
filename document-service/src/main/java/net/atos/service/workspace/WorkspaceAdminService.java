@@ -29,8 +29,8 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
 
     @Override
     public List<WorkspaceReadDto> getAllWorkspacesForUser() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return getAllWorkspacesForUser(authenticatedUserId);
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        return getAllWorkspacesForUser(userEmail);
     }
 
     @Override
@@ -42,9 +42,9 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId) {
+    public List<WorkspaceReadDto> getAllWorkspacesForUser(String userEmail) {
         return repository.findAll().stream()
-                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userEmail))
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
     }
@@ -85,9 +85,9 @@ public class WorkspaceAdminService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId) {
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(String userEmail) {
         return repository.findAll().stream()
-                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userEmail))
                 .filter(workspaceEntity -> !workspaceEntity.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());

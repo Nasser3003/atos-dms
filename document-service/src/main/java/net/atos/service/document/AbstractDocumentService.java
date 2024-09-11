@@ -37,6 +37,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
     @Transactional
     public DocumentReadOnlyDto createDocument(DocumentCreateDto createDto) {
         UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
         String sanitizedFileName = LocalFileUtil.sanitizeFileName(Objects.requireNonNull(extractFileName(createDto.getFilePath())));
 
@@ -44,7 +45,8 @@ public abstract class AbstractDocumentService implements IDocumentService {
                 sanitizedFileName,
                 createDto.getType(),
                 createDto.getSizeInBytes(),
-                userId
+                userId,
+                userEmail
         );
 
         fileStorageService.storeFile(userId, createDto.getFile(), sanitizedFileName);
@@ -54,8 +56,8 @@ public abstract class AbstractDocumentService implements IDocumentService {
     }
 
     boolean NotFileOwner(DocumentEntity document) {
-        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return !document.getCreatedByUserId().equals(userId);
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        return !document.getCreatedByUser().equals(userEmail);
     }
 
     DocumentReadOnlyDto updateDocumentHelper(DocumentEditDto documentEditDto) {
@@ -82,7 +84,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
             entity.setLanguages(documentEditDto.getLanguages());
 
         entity.setLastModified(LocalDateTime.now());
-        entity.setLastModifiedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        entity.setLastModifiedByUser(CustomJwtAuthenticationConverter.extractUserEmailFromContext());
 
         repository.save(entity);
 
@@ -111,7 +113,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentId);
         documentEntity.setLastAccessed(LocalDateTime.now());
-        documentEntity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        documentEntity.setLastAccessedByUser(CustomJwtAuthenticationConverter.extractUserEmailFromContext());
         repository.save(documentEntity);
 
         return new FileDownloadInfo(resource, fileName, contentType, contentLength);
@@ -137,7 +139,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
 
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentId);
         documentEntity.setLastAccessed(LocalDateTime.now());
-        documentEntity.setLastAccessedByUserId(CustomJwtAuthenticationConverter.extractUserIdFromContext());
+        documentEntity.setLastAccessedByUser(CustomJwtAuthenticationConverter.extractUserEmailFromContext());
         repository.save(documentEntity);
 
 
@@ -145,27 +147,27 @@ public abstract class AbstractDocumentService implements IDocumentService {
     }
 
     DocumentEntity addUserHelper(DocumentUserDto documentUserDto) {
-        if (documentUserDto.getUserId() == null)
+        if (documentUserDto.getUserEmail() == null)
             throw new IllegalArgumentException("user not found");
         if (documentUserDto.getDocumentId() == null)
             throw new IllegalArgumentException("document not found");
 
-        UUID userId = documentUserDto.getUserId();
+        String userEmail = documentUserDto.getUserEmail();
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
-        documentEntity.addUser(userId);
+        documentEntity.addUser(userEmail);
         repository.save(documentEntity);
         return documentEntity;
     }
 
     DocumentEntity removeUserHelper(DocumentUserDto documentUserDto) {
-        if (documentUserDto.getUserId() == null)
+        if (documentUserDto.getUserEmail() == null)
             throw new IllegalArgumentException("user not found");
         if (documentUserDto.getDocumentId() == null)
             throw new IllegalArgumentException("document not found");
 
-        UUID userId = documentUserDto.getUserId();
+        String userEmail = documentUserDto.getUserEmail();
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
-        documentEntity.removeUser(userId);
+        documentEntity.removeUser(userEmail);
         repository.save(documentEntity);
         return documentEntity;
     }

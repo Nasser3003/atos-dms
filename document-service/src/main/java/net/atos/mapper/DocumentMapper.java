@@ -26,9 +26,9 @@ public class DocumentMapper {
                 entity.getDateOfCreation(),
                 entity.getLastAccessed(),
                 entity.getLastModified(),
-                entity.getCreatedByUserId(),
-                entity.getLastModifiedByUserId(),
-                entity.getLastAccessedByUserId(),
+                entity.getCreatedByUser(),
+                entity.getLastModifiedByUser(),
+                entity.getLastAccessedByUser(),
                 entity.getWorkspaces().stream().map(WorkspaceMapper::mapToSimpleWorkspaceDto).collect(Collectors.toSet())
         );
     }

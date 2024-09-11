@@ -16,6 +16,6 @@ public class WorkspaceUserDto {
     @NotNull(message = "workspaceId cannot be null")
     private UUID workspaceId;
 
-    @NotBlank(message = "userId cannot be null")
-    private UUID userId;
+    @NotBlank(message = "email cannot be null")
+    private String userEmail;
 }

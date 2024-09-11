@@ -33,10 +33,10 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
-    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId) {
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(String userEmail) {
         return repository.findAll().stream()
                 .filter(f -> !f.isDeleted())
-                .filter(f -> f.getCreatedByUserId().equals(userId))
+                .filter(f -> f.getCreatedByUser().equals(userEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }

@@ -18,7 +18,7 @@ public interface IWorkspaceService {
 
     List<WorkspaceReadDto> getAllWorkspaces();
 
-    List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId);
+    List<WorkspaceReadDto> getAllWorkspacesForUser(String userEmail);
 
     WorkspaceReadDto getWorkspace(UUID id);
 
@@ -32,7 +32,7 @@ public interface IWorkspaceService {
 
     List<DocumentReadOnlyDto> getAllDocumentsByWorkspaceId(UUID workspaceId);
 
-    List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId);
+    List<WorkspaceReadDto> getNoneDeletedWorkspaces(String userEmail);
 }
 
 

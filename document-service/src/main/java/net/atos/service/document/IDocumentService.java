@@ -15,7 +15,7 @@ public interface IDocumentService {
 
     List<DocumentReadOnlyDto> getAllUserDocuments();
 
-    List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId);
+    List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(String userEmail);
 
     List<DocumentReadOnlyDto> getAllDeletedDocuments();
 

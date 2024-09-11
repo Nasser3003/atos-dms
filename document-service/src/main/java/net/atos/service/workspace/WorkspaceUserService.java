@@ -30,8 +30,8 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
 
     @Override
     public List<WorkspaceReadDto> getAllWorkspacesForUser() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return getAllWorkspacesForUser(authenticatedUserId);
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        return getAllWorkspacesForUser(userEmail);
     }
 
     @Override
@@ -40,9 +40,9 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getAllWorkspacesForUser(UUID userId) {
+    public List<WorkspaceReadDto> getAllWorkspacesForUser(String userEmail) {
         return repository.findAll().stream()
-                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userEmail))
                 .filter(w -> !w.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
@@ -51,9 +51,9 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     @Override
     public WorkspaceReadDto getWorkspace(UUID id) {
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(id);
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
-        if (!workspaceEntity.isUserAuthorized(authenticatedUserId))
+        if (!workspaceEntity.isUserAuthorized(userEmail))
             throw new UnauthorizedException("you dont have permissions to access this workspace");
         return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
     }
@@ -70,10 +70,10 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
 
     @Override
     public void deleteWorkspace(UUID id) {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(id);
-        if (!workspaceEntity.getCreatedByUserId().equals(authenticatedUserId))
+        if (!workspaceEntity.getCreatedByUser().equals(userEmail))
             throw new UnauthorizedException("you dont have permissions to delete this workspace");
         workspaceEntity.setDeleted(true);
         repository.save(workspaceEntity);
@@ -81,22 +81,22 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
 
     @Override
     public WorkspaceReadDto addUser(WorkspaceUserDto workspaceUserDto) {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
-            throw new UnauthorizedException("you dont have permissions to add this User");
+        String userEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
-        if (!findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId()).getCreatedByUserId().equals(authenticatedUserId))
+        if (!findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId()).getCreatedByUser().equals(userEmail))
             throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
         return WorkspaceMapper.mapToReadWorkspace(addUserHelper(workspaceUserDto));
     }
 
     @Override
     public WorkspaceReadDto removeUser(WorkspaceUserDto workspaceUserDto) {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        if (!workspaceUserDto.getUserId().equals(authenticatedUserId))
-            throw new UnauthorizedException("you dont have permissions to remove this User");
-        if (!findNoneDeletedWorkspace(workspaceUserDto.getUserId()).getCreatedByUserId().equals(authenticatedUserId))
-            throw new UnauthorizedException("you dont have permissions to add edit this Workspace");
+        String currentUserEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        String workspaceOwnerEmail = findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId()).getCreatedByUser();
+        String userToRemoveEmail = workspaceUserDto.getUserEmail();
+
+        if (!currentUserEmail.equals(userToRemoveEmail) && !currentUserEmail.equals(workspaceOwnerEmail))
+            throw new UnauthorizedException("You don't have permissions to remove this user");
+
         return WorkspaceMapper.mapToReadWorkspace(removeUserHelper(workspaceUserDto));
     }
 
@@ -109,11 +109,11 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(UUID userId) {
-        if (!CustomJwtAuthenticationConverter.extractUserIdFromContext().equals(userId))
+    public List<WorkspaceReadDto> getNoneDeletedWorkspaces(String email) {
+        if (!CustomJwtAuthenticationConverter.extractUserEmailFromContext().equals(email))
             throw new UnauthorizedException("you dont have permissions to access this workspace");
         return repository.findAll().stream()
-                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(userId))
+                .filter(workspaceEntity -> workspaceEntity.isUserAuthorized(email))
                 .filter(workspaceEntity -> !workspaceEntity.isDeleted())
                 .map(WorkspaceMapper::mapToReadWorkspace)
                 .collect(Collectors.toList());
@@ -125,7 +125,7 @@ public class WorkspaceUserService extends AbstractWorkspaceService {
         if (notWorkspaceOwner(workspaceEntity))
             throw new UnauthorizedException("You are not authorized to add documents to this workspace");
         if (documentRepository.findById(addDocumentWorkspace.getDocumentId()).isPresent())
-            if (!documentRepository.findById(addDocumentWorkspace.getDocumentId()).get().getCreatedByUserId().equals(CustomJwtAuthenticationConverter.extractUserIdFromContext()))
+            if (!documentRepository.findById(addDocumentWorkspace.getDocumentId()).get().getCreatedByUser().equals(CustomJwtAuthenticationConverter.extractUserEmailFromContext()))
                 throw new UnauthorizedException("You are not authorized to share this document");
         return WorkspaceMapper.mapToReadWorkspace(addDocumentHelper(addDocumentWorkspace));
     }

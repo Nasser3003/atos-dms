@@ -17,10 +17,11 @@ public abstract class AbstractSearchService {
     private final DocumentRepository documentRepository;
 
     List<DocumentEntity> getAccessibleDocuments(List<DocumentEntity> documents) {
-        UUID authenticatedId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+
         return documents.stream()
                 .filter(documentEntity -> !documentEntity.isDeleted())
-                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedId))
+                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedEmail))
                 .collect(Collectors.toList());
     }
 
@@ -38,12 +39,6 @@ public abstract class AbstractSearchService {
 
         return new HashSet<>(allResults);
     }
-
-    abstract List<DocumentEntity> searchDocumentsByType(EnumDataType type);
-
-    abstract List<DocumentEntity> searchDocumentsByName(String name);
-
-    abstract List<DocumentEntity> searchDocumentsByTag(String tag);
 
     List<DocumentEntity> searchDocumentsByTypeHelper(EnumDataType type) {
         return documentRepository.findAllByType(type).stream()

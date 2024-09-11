@@ -30,43 +30,43 @@ public class DocumentUserService extends AbstractDocumentService {
 
     @Override
     public List<DocumentReadOnlyDto> getAllNoneDeletedDocuments() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
         return repository.findAll().stream()
                 .filter(f -> !f.isDeleted())
-                .filter(f -> f.getAccessibleByUsers().contains(authenticatedUserId))
+                .filter(f -> f.getAccessibleByUsers().contains(authenticatedEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<DocumentReadOnlyDto> getAllUserDocuments() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
         return repository.findAll().stream()
-                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedUserId))
+                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());    }
 
     @Override
-    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(UUID userId) {
+    public List<DocumentReadOnlyDto> getAllNoneDeletedDocumentsForUser(String userEmail) {
         throw new UnsupportedOperationException("This operation is not supported for this user type");
     }
 
     @Override
     public List<DocumentReadOnlyDto> getAllDeletedDocuments() {
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
 
         return repository.findAll().stream()
                 .filter(DocumentEntity::isDeleted)
-                .filter(f -> f.getAccessibleByUsers().contains(authenticatedUserId))
+                .filter(f -> f.getAccessibleByUsers().contains(authenticatedEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());    }
 
     @Override
     public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        UUID authenticatedId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedId))
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedEmail))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
@@ -94,8 +94,8 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public FileDownloadInfo downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedUserId))
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedEmail))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         try {
             return downloadFileHelper(id);
@@ -107,8 +107,8 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public PreviewFileResponse previewDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
-        UUID authenticatedUserId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedUserId))
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        if (!documentEntity.isUserAuthorized(authenticatedEmail))
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return previewFileHelper(id);
     }
@@ -116,10 +116,10 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public DocumentReadOnlyDto addUser(DocumentUserDto documentUserDto) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
-        UUID authenticatedUser = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
         if (documentEntity.isDeleted())
             throw new NotFoundException("Document doesnt exist");
-        if (!documentEntity.getCreatedByUserId().equals(authenticatedUser))
+        if (!documentEntity.getCreatedByUser().equals(authenticatedEmail))
             throw new UnauthorizedException("don't have the privileges for Document with id " + documentUserDto.getDocumentId());
         return DocumentMapper.mapToReadDocument(addUserHelper(documentUserDto));
     }
@@ -127,10 +127,10 @@ public class DocumentUserService extends AbstractDocumentService {
     @Override
     public DocumentReadOnlyDto removeUser(DocumentUserDto documentUserDto) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(documentUserDto.getDocumentId());
-        UUID authenticatedUser = CustomJwtAuthenticationConverter.extractUserIdFromContext();
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
         if (documentEntity.isDeleted())
             throw new NotFoundException("Document doesnt exist");
-        if (!documentEntity.getCreatedByUserId().equals(authenticatedUser))
+        if (!documentEntity.getCreatedByUser().equals(authenticatedEmail))
             throw new UnauthorizedException("don't have the privileges for Document with id " + documentUserDto.getDocumentId());
         return DocumentMapper.mapToReadDocument(removeUserHelper(documentUserDto));
     }

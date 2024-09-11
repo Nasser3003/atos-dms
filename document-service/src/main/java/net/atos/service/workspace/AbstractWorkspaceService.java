@@ -25,19 +25,19 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
     @Transactional
     public WorkspaceReadDto createWorkspace(WorkspaceCreateDto createDto) {
         WorkspaceEntity workspaceEntity = new WorkspaceEntity(createDto.getName(), createDto.getDescription(),
-                CustomJwtAuthenticationConverter.extractUserIdFromContext());
+                CustomJwtAuthenticationConverter.extractUserEmailFromContext());
         repository.save(workspaceEntity);
         return WorkspaceMapper.mapToReadWorkspace(workspaceEntity);
      }
 
     boolean notWorkspaceOwner(WorkspaceEntity workspaceEntity) {
-        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return !workspaceEntity.getCreatedByUserId().equals(userId);
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        return !workspaceEntity.getCreatedByUser().equals(authenticatedEmail);
     }
 
     boolean notWorkspaceMember(WorkspaceEntity workspaceEntity) {
-        UUID userId = CustomJwtAuthenticationConverter.extractUserIdFromContext();
-        return !workspaceEntity.getAccessibleByUsers().contains(userId);
+        String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
+        return !workspaceEntity.getAccessibleByUsers().contains(authenticatedEmail);
     }
 
     WorkspaceEntity findNoneDeletedWorkspace(UUID workspaceId) {
@@ -90,28 +90,28 @@ public abstract class AbstractWorkspaceService implements IWorkspaceService {
     }
 
     WorkspaceEntity addUserHelper(WorkspaceUserDto workspaceUserDto) {
-        if (workspaceUserDto.getUserId() == null)
+        if (workspaceUserDto.getUserEmail() == null)
             throw new IllegalArgumentException("user not found");
         if (workspaceUserDto.getWorkspaceId() == null)
             throw new IllegalArgumentException("workspace not found");
 
-        UUID userId = workspaceUserDto.getUserId();
+        String userEmail = workspaceUserDto.getUserEmail();
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId());
-        workspaceEntity.addUser(userId);
+        workspaceEntity.addUser(userEmail);
         repository.save(workspaceEntity);
         return workspaceEntity;
     }
 
     WorkspaceEntity removeUserHelper(WorkspaceUserDto workspaceUserDto) {
-        if (workspaceUserDto.getUserId() == null)
+        if (workspaceUserDto.getUserEmail() == null)
             throw new IllegalArgumentException("user not found");
         if (workspaceUserDto.getWorkspaceId() == null)
             throw new IllegalArgumentException("workspace not found");
 
 
-        UUID userId = workspaceUserDto.getUserId();
+        String userEmail = workspaceUserDto.getUserEmail();
         WorkspaceEntity workspaceEntity = findNoneDeletedWorkspace(workspaceUserDto.getWorkspaceId());
-        workspaceEntity.removeUser(userId);
+        workspaceEntity.removeUser(userEmail);
         repository.save(workspaceEntity);
         return workspaceEntity;
     }

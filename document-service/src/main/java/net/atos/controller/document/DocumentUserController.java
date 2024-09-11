@@ -74,7 +74,7 @@ public class DocumentUserController extends AbstractDocumentController {
     }
 
     @Override
-    @GetMapping("/rm/user")
+    @PutMapping("/rm/user")
     ResponseEntity<DocumentReadOnlyDto> removeUserToDocument(@RequestBody DocumentUserDto documentUserDto) {
         return ResponseEntity.ok(documentService.removeUser(documentUserDto));
     }

@@ -5,8 +5,6 @@ import net.atos.dto.document.DocumentCreateDto;
 import net.atos.dto.document.DocumentEditDto;
 import net.atos.dto.document.DocumentReadOnlyDto;
 import net.atos.dto.document.DocumentUserDto;
-import net.atos.dto.workspace.WorkspaceReadDto;
-import net.atos.dto.workspace.WorkspaceUserDto;
 import net.atos.model.enums.EnumDataType;
 import net.atos.service.document.IDocumentService;
 import net.atos.service.document.PreviewFileResponse;

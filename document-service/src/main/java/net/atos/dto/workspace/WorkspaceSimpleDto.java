@@ -15,6 +15,6 @@ public class WorkspaceSimpleDto {
     private String name;
     private String description;
     private LocalDateTime dateOfCreation;
-    private UUID createdByUserId;
-    private Set<UUID> accessibleByUsers;
+    private String createdByUser;
+    private Set<String> accessibleByUsers;
 }

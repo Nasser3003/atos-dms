@@ -8,7 +8,7 @@ public class WorkspaceMapper {
 
     public static WorkspaceSimpleDto mapToSimpleWorkspaceDto(WorkspaceEntity entity) {
         return new WorkspaceSimpleDto(entity.getId(), entity.getName(), entity.getDescription(),
-                entity.getDateOfCreation(), entity.getCreatedByUserId(), entity.getAccessibleByUsers());
+                entity.getDateOfCreation(), entity.getCreatedByUser(), entity.getAccessibleByUsers());
     }
 
     public static WorkspaceReadDto mapToReadWorkspace (WorkspaceEntity entity) {
@@ -20,7 +20,7 @@ public class WorkspaceMapper {
                 entity.getName(),
                 entity.getDescription(),
                 entity.getDateOfCreation(),
-                entity.getCreatedByUserId(),
+                entity.getCreatedByUser(),
                 entity.getDocuments(),
                 entity.getAccessibleByUsers()
         );

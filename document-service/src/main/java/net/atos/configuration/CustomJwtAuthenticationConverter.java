@@ -1,8 +1,6 @@
 package net.atos.configuration;
 
 import net.atos.model.enums.EnumRole;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -64,6 +62,22 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
 
             try {
                 return UUID.fromString(userId);
+            } catch (IllegalArgumentException e) {
+                throw new BadCredentialsException("Invalid User ID in JWT");
+            }
+        }
+        throw new BadCredentialsException("User not authenticated or invalid authentication type");
+    }
+
+    public static String extractUserEmailFromContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+            Jwt token = jwtAuth.getToken();
+            String email = token.getSubject();
+
+            try {
+                return email;
             } catch (IllegalArgumentException e) {
                 throw new BadCredentialsException("Invalid User ID in JWT");
             }

@@ -26,15 +26,16 @@ import java.util.stream.Collectors;
 @Document(collection = "documents")
 public class DocumentEntity {
 
-    public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId) {
+    public DocumentEntity(String filePath, EnumDataType type, Long sizeInBytes, UUID createdByUserId,  String createdByUser) {
         this.filePath = filePath;
         this.type = type;
         this.sizeInBytes = sizeInBytes;
+        this.createdByUser = createdByUser;
+        this.lastModifiedByUser = createdByUser;
         this.createdByUserId = createdByUserId;
-        this.lastModifiedByUserId = createdByUserId;
         initializeAttributes(type);
         this.accessibleByUsers = new HashSet<>();
-        accessibleByUsers.add(createdByUserId);
+        accessibleByUsers.add(createdByUser);
     }
 
     @Id
@@ -65,7 +66,7 @@ public class DocumentEntity {
 
     @NotNull
     @Field("last_accessed_by_user_id")
-    private UUID lastAccessedByUserId;
+    private String lastAccessedByUser;
 
     @NotNull
     @Field("last_modified")
@@ -82,14 +83,18 @@ public class DocumentEntity {
     @Setter(AccessLevel.NONE)
     private UUID createdByUserId;
 
+    @Field("created_by_user")
+    @Setter(AccessLevel.NONE)
+    private String createdByUser;
+
     @NotNull
     @Field("accessible_by_users")
     @Setter(AccessLevel.NONE)
-    private Set<UUID> accessibleByUsers;
+    private Set<String> accessibleByUsers;
 
     @NotNull
-    @Field("last_modified_by_user_id")
-    private UUID lastModifiedByUserId;
+    @Field("last_modified_by_user")
+    private String lastModifiedByUser;
 
     private Set<String> tags = new HashSet<>();
 
@@ -111,10 +116,10 @@ public class DocumentEntity {
     @Setter(AccessLevel.NONE)
     private Map<String, String> attributes = new HashMap<>();
 
-    public boolean isUserAuthorized(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null");
-        return createdByUserId.equals(id) || accessibleByUsers.contains(id);
+    public boolean isUserAuthorized(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null");
+        return createdByUser.equals(email) || accessibleByUsers.contains(email);
     }
 
     public Set<WorkspaceEntity> getWorkspaces() {
@@ -182,31 +187,31 @@ public class DocumentEntity {
         return this;
     }
 
-    public void addUser(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null or empty");
+    public void addUser(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null or empty");
 
-        if (accessibleByUsers.contains(id))
-            throw new IllegalArgumentException("User already has access: " + id);
+        if (accessibleByUsers.contains(email))
+            throw new IllegalArgumentException("User already has access: " + email);
 
-        accessibleByUsers.add(id);
+        accessibleByUsers.add(email);
     }
 
-    public DocumentEntity removeUser(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null or empty");
+    public DocumentEntity removeUser(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null or empty");
 
-        if (!accessibleByUsers.contains(id))
-            throw new IllegalArgumentException("User does not have access: " + id);
+        if (!accessibleByUsers.contains(email))
+            throw new IllegalArgumentException("User does not have access: " + email);
 
-        if (id.equals(createdByUserId))
-            throw new IllegalArgumentException("cannot remove the owner: " + id);
+        if (email.equals(createdByUser))
+            throw new IllegalArgumentException("cannot remove the owner: " + email);
 
-        accessibleByUsers.remove(id);
+        accessibleByUsers.remove(email);
         return this;
     }
 
-    public Set<UUID> getAccessibleByUsers() {
+    public Set<String > getAccessibleByUsers() {
         return new HashSet<>(accessibleByUsers);
     }
 
@@ -226,13 +231,12 @@ public class DocumentEntity {
         workspaces.add(workspace);
     }
 
-    public DocumentEntity removeWorkspace(WorkspaceEntity workspace) {
+    public void removeWorkspace(WorkspaceEntity workspace) {
         if (workspace == null)
             throw new IllegalArgumentException("Workspace cannot be null");
         if (!workspaces.contains(workspace))
             throw new IllegalArgumentException("Document is not in this workspace: " + workspace.getId());
         workspaces.remove(workspace);
-        return this;
     }
 
     private void initializeAttributes(EnumDataType type) {
@@ -268,12 +272,13 @@ public class DocumentEntity {
                 ", type=" + type +
                 ", dateOfCreation=" + dateOfCreation +
                 ", lastAccessed=" + lastAccessed +
-                ", lastAccessedByUserId=" + lastAccessedByUserId +
+                ", lastAccessedByUser=" + lastAccessedByUser +
                 ", lastModified=" + lastModified +
                 ", sizeInBytes=" + sizeInBytes +
+                ", createdByUser=" + createdByUser +
                 ", createdByUserId=" + createdByUserId +
                 ", accessibleByUsers=" + accessibleByUsers +
-                ", lastModifiedByUserId=" + lastModifiedByUserId +
+                ", lastModifiedByUser=" + lastModifiedByUser +
                 ", tags=" + tags +
                 ", isPublic=" + isPublic +
                 ", isDeleted=" + isDeleted +

@@ -21,10 +21,12 @@ import java.util.stream.Collectors;
 @Document(collection = "workspaces")
 public class WorkspaceEntity {
 
-    public WorkspaceEntity(String name, String description, UUID createdByUserId) {
+    public WorkspaceEntity(String name, String description, String createdByUser) {
         this.name = name;
         this.description = description;
-        this.createdByUserId = createdByUserId;
+        this.createdByUser = createdByUser;
+        accessibleByUsers = new HashSet<>();
+        accessibleByUsers.add(createdByUser);
     }
 
     @Id
@@ -45,7 +47,7 @@ public class WorkspaceEntity {
     @NotNull
     @Field("created_by_user_id")
     @Setter(AccessLevel.NONE)
-    private UUID createdByUserId;
+    private String createdByUser;
 
     @DBRef
     @JsonManagedReference
@@ -54,34 +56,39 @@ public class WorkspaceEntity {
     @NotNull
     @Field("accessible_by_users")
     @Setter(AccessLevel.NONE)
-    private Set<UUID> accessibleByUsers = new HashSet<>();
+    private Set<String> accessibleByUsers = new HashSet<>();
 
     private boolean isDeleted = false;
 
-    public void addUser(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null");
-        if (accessibleByUsers.contains(id))
-            throw new IllegalArgumentException("User already has access: " + id);
-        accessibleByUsers.add(id);
+    public void addUser(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null");
+        if (accessibleByUsers.contains(email))
+            throw new IllegalArgumentException("User already has access: " + email);
+        accessibleByUsers.add(email);
     }
 
-    public WorkspaceEntity removeUser(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null");
-        if (!accessibleByUsers.contains(id))
-            throw new IllegalArgumentException("User does not have access: " + id);
-        accessibleByUsers.remove(id);
+    public WorkspaceEntity removeUser(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null");
+
+        if (!accessibleByUsers.contains(email))
+            throw new IllegalArgumentException("User does not have access: " + email);
+
+        if (email.equals(createdByUser))
+            throw new IllegalArgumentException("cannot remove the owner: " + email);
+
+        accessibleByUsers.remove(email);
         return this;
     }
 
-    public boolean isUserAuthorized(UUID id) {
-        if (id == null)
-            throw new IllegalArgumentException("User id cannot be null");
-        return createdByUserId.equals(id) || accessibleByUsers.contains(id);
+    public boolean isUserAuthorized(String email) {
+        if (email == null)
+            throw new IllegalArgumentException("User email cannot be null");
+        return createdByUser.equals(email) || accessibleByUsers.contains(email);
     }
 
-    public Set<UUID> getAccessibleUsers() {
+    public Set<String> getAccessibleUsers() {
         return new HashSet<>(accessibleByUsers);
     }
 
@@ -114,7 +121,7 @@ public class WorkspaceEntity {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", dateOfCreation=" + dateOfCreation +
-                ", createdByUserId=" + createdByUserId +
+                ", createdByUser=" + createdByUser +
                 ", workspaces=" + documents.stream().map(DocumentEntity::getId).collect(Collectors.toSet()) +
                 ", accessibleByUsers=" + accessibleByUsers +
                 ", isDeleted=" + isDeleted +

@@ -16,8 +16,8 @@ public class WorkspaceReadDto {
     private String name;
     private String description;
     private LocalDateTime dateOfCreation;
-    private UUID createdByUserId;
+    private String createdByUser;
     private Set<DocumentEntity> documents;
-    private Set<UUID> accessibleByUsers;
+    private Set<String> accessibleByUsers;
 
 }

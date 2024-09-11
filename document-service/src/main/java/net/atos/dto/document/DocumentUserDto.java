@@ -16,6 +16,6 @@ public class DocumentUserDto {
     @NotNull(message = "documentId cannot be null")
     private UUID documentId;
 
-    @NotBlank(message = "userId cannot be null")
-    private UUID userId;
+    @NotBlank(message = "email cannot be null")
+    private String userEmail;
 }
