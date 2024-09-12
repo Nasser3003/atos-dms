@@ -34,7 +34,7 @@ This is the backend component of a Document Management System project. Built wit
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-repo/dms-backend.git
+   git clone https://github.com/Nasser3003/atos-dms.git
    ```
 
 2. Navigate to the project directory:
