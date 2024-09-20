@@ -57,6 +57,13 @@ public class DocumentUserController extends AbstractDocumentController {
     }
 
     @Override
+    @PutMapping("/undelete/{id}")
+    ResponseEntity<Void> undeleteDocument(@PathVariable UUID id) {
+        documentService.undeleteDocument(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
     @GetMapping("/download/{id}")
     ResponseEntity<Resource> downloadDocument(@PathVariable UUID id) {
         FileDownloadInfo fileInfo = documentService.downloadDocument(id);

@@ -79,6 +79,13 @@ public class DocumentAdminService extends AbstractDocumentService {
     }
 
     @Override
+    public void undeleteDocument(UUID id) {
+        DocumentEntity documentEntity = findDocumentById(id);
+        documentEntity.setDeleted(false);
+        repository.save(documentEntity);
+    }
+
+    @Override
     public FileDownloadInfo downloadDocument(UUID id) {
         try {
             return downloadFileHelper(id);

@@ -51,6 +51,8 @@ public abstract class AbstractDocumentController {
 
     abstract ResponseEntity<Void> deleteDocument(@PathVariable UUID id);
 
+    abstract ResponseEntity<Void> undeleteDocument(@PathVariable UUID id);
+
     abstract ResponseEntity<Resource> downloadDocument(@PathVariable UUID id);
 
     abstract ResponseEntity<PreviewFileResponse> previewFile(@PathVariable UUID id);

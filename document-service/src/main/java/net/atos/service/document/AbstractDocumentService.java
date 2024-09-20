@@ -172,7 +172,7 @@ public abstract class AbstractDocumentService implements IDocumentService {
         return documentEntity;
     }
 
-    private DocumentEntity findDocumentById(UUID id) {
+    DocumentEntity findDocumentById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Document with id " + id + " not found"));
 

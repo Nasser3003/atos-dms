@@ -34,7 +34,7 @@ public class DocumentUserService extends AbstractDocumentService {
 
         return repository.findAll().stream()
                 .filter(f -> !f.isDeleted())
-                .filter(f -> f.getAccessibleByUsers().contains(authenticatedEmail))
+                .filter(f -> f.isPublic() || f.getAccessibleByUsers().contains(authenticatedEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());
     }
@@ -43,7 +43,7 @@ public class DocumentUserService extends AbstractDocumentService {
     public List<DocumentReadOnlyDto> getAllUserDocuments() {
         String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
         return repository.findAll().stream()
-                .filter(documentEntity -> documentEntity.getAccessibleByUsers().contains(authenticatedEmail))
+                .filter(f -> f.isPublic() || f.getAccessibleByUsers().contains(authenticatedEmail))
                 .map(DocumentMapper::mapToReadDocument)
                 .collect(Collectors.toList());    }
 
@@ -66,7 +66,7 @@ public class DocumentUserService extends AbstractDocumentService {
     public DocumentReadOnlyDto getDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedEmail))
+        if (!documentEntity.isUserAuthorized(authenticatedEmail) && !documentEntity.isPublic())
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return DocumentMapper.mapToReadDocument(documentEntity);
     }
@@ -92,10 +92,19 @@ public class DocumentUserService extends AbstractDocumentService {
     }
 
     @Override
+    public void undeleteDocument(UUID id) {
+        DocumentEntity documentEntity = findDocumentById(id);
+        if (NotFileOwner(documentEntity))
+            throw new UnauthorizedException("don't have the privileges for Document with id " + id);
+        documentEntity.setDeleted(false);
+        repository.save(documentEntity);
+    }
+
+    @Override
     public FileDownloadInfo downloadDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedEmail))
+        if (!documentEntity.isUserAuthorized(authenticatedEmail) && !documentEntity.isPublic())
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         try {
             return downloadFileHelper(id);
@@ -108,7 +117,7 @@ public class DocumentUserService extends AbstractDocumentService {
     public PreviewFileResponse previewDocument(UUID id) {
         DocumentEntity documentEntity = findNoneDeletedDocumentById(id);
         String authenticatedEmail = CustomJwtAuthenticationConverter.extractUserEmailFromContext();
-        if (!documentEntity.isUserAuthorized(authenticatedEmail))
+        if (!documentEntity.isUserAuthorized(authenticatedEmail) && !documentEntity.isPublic())
             throw new UnauthorizedException("don't have the privileges for Document with id " + id);
         return previewFileHelper(id);
     }

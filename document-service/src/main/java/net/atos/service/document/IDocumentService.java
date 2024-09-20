@@ -25,6 +25,8 @@ public interface IDocumentService {
 
     void deleteDocument(UUID id);
 
+    void undeleteDocument(UUID id);
+
     FileDownloadInfo downloadDocument(UUID id);
 
     PreviewFileResponse previewDocument(UUID id);
