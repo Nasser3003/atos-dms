@@ -34,6 +34,12 @@ public class DocumentAdminController extends AbstractDocumentController {
     }
 
     @Override
+    @GetMapping("/deleted/all")
+    ResponseEntity<List<DocumentReadOnlyDto>> getALlDeletedDocuments() {
+        return ResponseEntity.ok(documentService.getAllDeletedDocuments());
+    }
+
+    @Override
     @GetMapping("/{id}")
     ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id) {
         return ResponseEntity.ok(documentService.getDocument(id));

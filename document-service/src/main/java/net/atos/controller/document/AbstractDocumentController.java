@@ -43,6 +43,8 @@ public abstract class AbstractDocumentController {
 
     abstract ResponseEntity<List<DocumentReadOnlyDto>> getAllDocuments();
 
+    abstract ResponseEntity<List<DocumentReadOnlyDto>> getALlDeletedDocuments();
+
     abstract ResponseEntity<DocumentReadOnlyDto> getDocument(@PathVariable UUID id);
 
     abstract ResponseEntity<DocumentReadOnlyDto> updateDocument(@RequestBody DocumentEditDto documentEditDto);
